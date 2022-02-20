@@ -8,7 +8,7 @@ import {
   ObservableInput,
   ReplaySubject,
   interval,
-  isObservable as isObservable_
+  isObservable as isObservable_,
 } from 'rxjs';
 import { first, tap } from 'rxjs/operators';
 import { ObserverHandlerFunc } from '../types';

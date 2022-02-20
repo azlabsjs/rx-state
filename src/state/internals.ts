@@ -48,7 +48,6 @@ export const setStoreName = <T>(instance: T, name: string) => {
     configurable: true,
     writable: true,
     enumerable: true,
-    
   });
   if (global_) {
     const stores = (getStores() as Map<symbol, T>) ?? new Map<symbol, T>();
