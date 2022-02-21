@@ -58,3 +58,37 @@ export const setStoreName = <T>(instance: T, name: string) => {
   }
   return instance;
 };
+
+export const getObjectProperty = <T extends { [prop: string]: any }>(
+  source: T,
+  key: string,
+  seperator: string = '.'
+) => {
+  if (
+    key === '' ||
+    typeof key === 'undefined' ||
+    key === null ||
+    typeof source === 'undefined' ||
+    source === null
+  ) {
+    return source ?? undefined;
+  }
+  if (key.includes(seperator ?? '.')) {
+    // Creates an array of inner properties
+    const properties = key.split(seperator ?? '.');
+    let current = source;
+    // Reduce the source object to a single value
+    return properties.reduce((carry, prop) => {
+      if (carry) {
+        const type = typeof current;
+        carry =
+          (type === 'object' || type === 'function') && carry[prop]
+            ? carry[prop] ?? undefined
+            : undefined;
+      }
+      return carry;
+    }, source);
+  } else {
+    return source ? source[key] : undefined;
+  }
+};

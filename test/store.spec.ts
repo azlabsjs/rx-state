@@ -12,6 +12,7 @@ import {
 } from '../src';
 import { delay, map, tap } from 'rxjs/operators';
 import { FluxStore } from '../src/state';
+import { Select } from '../src/state/helpers';
 
 // @internal Provides an instance of javascript global context
 const global_ = !(typeof global === 'undefined' || global === null)
@@ -178,8 +179,26 @@ describe('Rx state test definitions', () => {
     provider.store$
       .connect()
       .pipe(
+        Select<MessageState, Message[]>('messages'),
         tap(state => {
-          expect(state.messages).toEqual([]);
+          expect(state).toEqual([]);
+          done();
+        })
+      )
+      .subscribe();
+  });
+
+  it('should return the list of messages when a selector is called on the state', (done: jest.DoneCallback) => {
+    Dispatch(provider.store$)({
+      type: '[EMPTY_STORE_MESSAGES]',
+    });
+
+    provider.store$
+      .connect()
+      .pipe(
+        Select(state => state.messages),
+        tap(state => {
+          expect(state).toEqual([]);
           done();
         })
       )

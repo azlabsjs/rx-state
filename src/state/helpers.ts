@@ -1,4 +1,5 @@
-import { isObservable } from 'rxjs';
+import { isObservable, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import {
   Action,
   ActionCreatorHandlerFn,
@@ -6,8 +7,11 @@ import {
   StateReducerFn,
   Store,
 } from '../types';
-import { getStores, setStoreName } from './internals';
+import { getObjectProperty, getStores, setStoreName } from './internals';
 import { FluxStore } from './rx-state';
+
+type SelecPropType<T, V> = string | ((state: T) => V);
+type SelectorReturnType<S, T> = (source: Observable<S>) => Observable<T>;
 
 const dispatchAction = <T>(
   store: Store<T, ActionType>,
@@ -91,3 +95,21 @@ export const Destroy = () =>
       store.destroy();
     }
   });
+
+export function Select<T, V>(
+  prop?: SelecPropType<T, V>
+): SelectorReturnType<T, V> {
+  return (source$: Observable<T>) => {
+    return source$.pipe(
+      map(state => {
+        if (typeof prop === 'function') {
+          return prop(state);
+        }
+        if (typeof prop === 'string' && typeof state === 'object') {
+          return getObjectProperty(state, prop) as V;
+        }
+        return (state as any) as V;
+      })
+    );
+  };
+}

@@ -19,7 +19,6 @@
     "size": "size-limit",
     "analyze": "size-limit --why"
   },
-  "peerDependencies": {},
   "husky": {
     "hooks": {
       "pre-commit": "tsdx lint"
@@ -53,7 +52,8 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
-    "rxjs": "*"
+    "rxjs": "^6.6.7",
+    "rxjs-compat": "^6.6.7"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/@iazlabs"
