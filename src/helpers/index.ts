@@ -9,4 +9,6 @@ export {
   timeout,
   rxtimeout,
   empty,
+  firstValueFrom,
+  lastValueFrom,
 } from './functions';

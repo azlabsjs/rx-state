@@ -9,6 +9,8 @@ export {
   timeout,
   rxtimeout,
   empty,
+  lastValueFrom,
+  firstValueFrom,
 } from './helpers';
 
 export {

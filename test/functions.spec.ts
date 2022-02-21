@@ -14,6 +14,7 @@ import {
   observableOf,
   empty,
   rxtimeout,
+  lastValueFrom,
 } from '../src';
 
 describe('Observable creation function', () => {
@@ -39,7 +40,7 @@ describe('Observable creation function', () => {
   it('observableOf({}) should internally call of({})', async (done: jest.DoneCallback) => {
     const observable = observableOf({});
     expect(observable).toBeInstanceOf(Observable);
-    const value = await observable.toPromise();
+    const value = await lastValueFrom(observable);
     expect(value).toEqual({});
     done();
   });
@@ -51,7 +52,7 @@ describe('Observable creation function', () => {
       })
     );
     expect(observable).toBeInstanceOf(Observable);
-    const value = await observable.toPromise();
+    const value = await lastValueFrom(observable);
     expect(value).toEqual('Hello World!');
     done();
   });
