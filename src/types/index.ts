@@ -12,7 +12,11 @@ export {
   Action,
   ActionType,
 } from './actions';
-export { StateReducerFn } from './reducer';
+
+// Reducers type defintion import
+export { StateReducerFn, PartialStateReducerFn } from './reducer';
+
+// Store interface definition
 export { Store } from './state';
 
 // Creates a new observable subject

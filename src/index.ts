@@ -22,6 +22,8 @@ export {
   resetStateAction,
   Store,
   Destroy,
+  createReducer,
+  Select,
 } from './state';
 
 // Type definitions

@@ -9,10 +9,11 @@ import {
   errorAction,
   Dispatch,
   Store,
+  createReducer,
+  Select,
 } from '../src';
 import { delay, map, tap } from 'rxjs/operators';
 import { FluxStore } from '../src/state';
-import { Select } from '../src/state/helpers';
 
 // @internal Provides an instance of javascript global context
 const global_ = !(typeof global === 'undefined' || global === null)
@@ -206,24 +207,20 @@ describe('Rx state test definitions', () => {
   });
 
   it('should test decorated store class', (done: jest.DoneCallback) => {
-    const store = new DummyStore((state, action) => {
-      switch (action.type) {
-        case '[INCREMENTS]':
-          return ++state;
-        case '[DECREMENTS]':
-          return --state;
-        default:
-          return state;
-      }
-    }, 0);
-
+    const store = new DummyStore(
+      createReducer({
+        '[INCREMENTS]': state => ++state,
+        '[DECREMENTS]': state => --state,
+      }),
+      0
+    );
     Dispatch(store)({ type: '[INCREMENTS]' });
-
+    Dispatch(store)({ type: '[INCREMENTS]' });
     store
       .connect()
       .pipe(
         tap(state => {
-          expect(state).toEqual(1);
+          expect(state).toEqual(2);
           done();
         })
       )
