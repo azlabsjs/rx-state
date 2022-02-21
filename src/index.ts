@@ -19,7 +19,6 @@ export {
   asyncAction,
   resetStateAction,
   Store,
-  StoreProp,
   Destroy,
 } from './state';
 
