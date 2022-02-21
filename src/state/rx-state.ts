@@ -16,12 +16,14 @@ declare const ngDevMode: boolean;
 
 export class FluxStore<T, A extends ActionType>
   implements Store<T, A>, SelectAware<T> {
+  // @internal
   // Store internal state
   private readonly _state$ = createSubject<T>(1);
 
   // tslint:disable-next-line: variable-name
   state$: Observable<T> = this._state$.asObservable();
 
+  // @internal
   // tslint:disable-next-line: variable-name
   private _actions$ = createSubject<A | Observable<A>>();
 
@@ -42,6 +44,7 @@ export class FluxStore<T, A extends ActionType>
     this._state$.complete();
   }
 
+  // @internal
   private _applyReducer = (
     reducer: StateReducerFn<T, A>,
     previous: any,

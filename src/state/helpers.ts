@@ -62,7 +62,7 @@ export const createStore = <T, A extends ActionType>(
   name?: string
 ) =>
   name
-    ? (setStoreName(new FluxStore(reducer, initial), name) as Store<T, A>)
+    ? (setStoreName(new FluxStore(reducer, initial), name) as FluxStore<T, A>)
     : new FluxStore(reducer, initial);
 
 /**

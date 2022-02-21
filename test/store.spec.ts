@@ -178,9 +178,8 @@ describe('Rx state test definitions', () => {
     });
 
     provider.store$
-      .connect()
+      .select<Message[]>('messages')
       .pipe(
-        Select<MessageState, Message[]>('messages'),
         tap(state => {
           expect(state).toEqual([]);
           done();
