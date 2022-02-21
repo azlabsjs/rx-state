@@ -1,5 +1,17 @@
 import { Observable } from 'rxjs';
 
+export type SelecPropType<T, V> = string | ((state: T) => V);
+export type SelectorReturnType<S, T> = (source: Observable<S>) => Observable<T>;
+
+export interface SelectAware<T> {
+  /**
+   * Select a slice of the store state user provided selector
+   *
+   * @param prop
+   */
+  select<RType>(prop: SelecPropType<T, RType>): Observable<RType>;
+}
+
 export interface Store<T, A> {
   /**
    * Dispatch a new action into the store

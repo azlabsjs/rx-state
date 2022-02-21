@@ -4,17 +4,14 @@ import {
   Action,
   ActionCreatorHandlerFn,
   ActionType,
+  ReducersConfig,
+  SelecPropType,
+  SelectorReturnType,
   StateReducerFn,
   Store,
 } from '../types';
 import { getObjectProperty, getStores, setStoreName } from './internals';
 import { FluxStore } from './rx-state';
-
-type SelecPropType<T, V> = string | ((state: T) => V);
-type SelectorReturnType<S, T> = (source: Observable<S>) => Observable<T>;
-type ReducersConfig<T, A> = {
-  [index: string]: StateReducerFn<T, A>;
-};
 
 const dispatchAction = <T>(
   store: Store<T, ActionType>,

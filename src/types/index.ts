@@ -14,10 +14,14 @@ export {
 } from './actions';
 
 // Reducers type defintion import
-export { StateReducerFn, PartialStateReducerFn } from './reducer';
+export {
+  StateReducerFn,
+  PartialStateReducerFn,
+  ReducersConfig,
+} from './reducer';
 
 // Store interface definition
-export { Store } from './state';
+export { Store, SelecPropType, SelectAware, SelectorReturnType } from './state';
 
 // Creates a new observable subject
 export type CreateSubjectFunc<T> = (
