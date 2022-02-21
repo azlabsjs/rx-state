@@ -2,7 +2,6 @@ import {
   BehaviorSubject,
   EMPTY,
   isObservable,
-  lastValueFrom,
   Observable,
   ReplaySubject,
   Subject,
@@ -40,7 +39,7 @@ describe('Observable creation function', () => {
   it('observableOf({}) should internally call of({})', async (done: jest.DoneCallback) => {
     const observable = observableOf({});
     expect(observable).toBeInstanceOf(Observable);
-    const value = await lastValueFrom(observable);
+    const value = await observable.toPromise();
     expect(value).toEqual({});
     done();
   });
@@ -52,7 +51,7 @@ describe('Observable creation function', () => {
       })
     );
     expect(observable).toBeInstanceOf(Observable);
-    const value = await lastValueFrom(observable);
+    const value = await observable.toPromise();
     expect(value).toEqual('Hello World!');
     done();
   });
