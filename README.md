@@ -8,6 +8,29 @@ Added RxJS firstValueFrom and lastValueFrom from v7.x
 
 ## Usage
 
+Import all basic features
+
+```ts
+import {
+  BehaviorSubject,
+  EMPTY,
+  isObservable,
+  Observable,
+  ReplaySubject,
+  Subject,
+} from 'rxjs';
+import {
+  createObservable,
+  createStateful,
+  createSubject,
+  observableFrom,
+  observableOf,
+  empty,
+  rxtimeout,
+  lastValueFrom,
+} from '../src';
+```
+
 ### Return an instance of RxJs observable
 
 ```ts
