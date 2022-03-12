@@ -3,17 +3,15 @@ import {
   createStore,
   observableOf,
   Action,
-  timeout,
-  doLog,
-  resetStateAction,
-  errorAction,
   Dispatch,
   Store,
   createReducer,
   Select,
+  rxtimeout,
 } from '../src';
 import { delay, map, tap } from 'rxjs/operators';
 import { FluxStore } from '../src/state';
+import { lastValueFrom } from 'rxjs';
 
 // @internal Provides an instance of javascript global context
 const global_ = !(typeof global === 'undefined' || global === null)
@@ -95,10 +93,9 @@ class StoreProvider {
 })
 class DummyStore extends FluxStore<number, Action<number>> {}
 
-const provider = new StoreProvider();
-
 describe('Rx state test definitions', () => {
   it('Expect Store to be updated by value provided to action creator parameters', async () => {
+    const provider = new StoreProvider();
     const messagesAction = createAction(
       provider.store$,
       (messages: Partial<Message>[]) => {
@@ -118,7 +115,6 @@ describe('Rx state test definitions', () => {
       return {
         type: '[MESSAGES_LOADING]',
         payload: observableOf<Message>(payload).pipe(
-          doLog(),
           delay(1000),
           map(
             (source) =>
@@ -148,15 +144,13 @@ describe('Rx state test definitions', () => {
       content: 'Loaded Message content',
       destination: 'azandrewdevelopper@gmail.com',
     });
-    resetStateAction(provider.store$)();
-    errorAction(provider.store$)();
-    await new Promise<void>((resolve) => {
-      timeout(() => {
+    await lastValueFrom(
+      rxtimeout(() => {
         provider.store$
           .connect()
           .pipe()
           .subscribe((value) => {
-            expect(value).toEqual([
+            expect(value.messages).toEqual([
               {
                 id: '0023',
                 subject: 'Subject1 [UPDATED]',
@@ -171,46 +165,49 @@ describe('Rx state test definitions', () => {
               },
             ]);
           });
-        resolve();
-      }, 2000);
-    });
+      }, 1000)
+    );
   });
 
   it('Dispatch an action to the Messages Store', async () => {
+    const provider = new StoreProvider();
     Dispatch(provider.store$)({
       type: '[EMPTY_STORE_MESSAGES]',
     });
 
-    await new Promise<void>((resolve) => {
-      provider.store$
-        .select<Message[]>('messages')
-        .pipe(
-          tap((state) => {
-            expect(state).toEqual([]);
-            resolve();
-          })
-        )
-        .subscribe();
-    });
+    await lastValueFrom(
+      rxtimeout(() => {
+        provider.store$
+          .select<Message[]>('messages')
+          .pipe(
+            tap((state) => {
+              expect(state).toEqual([]);
+            })
+          )
+          .subscribe();
+      }, 1000)
+    );
   });
 
   it('should return the list of messages when a selector is called on the state', async () => {
+    const provider = new StoreProvider();
     Dispatch(provider.store$)({
       type: '[EMPTY_STORE_MESSAGES]',
     });
 
-    await new Promise<void>((resolve) => {
-      provider.store$
+    await lastValueFrom(
+      rxtimeout(() => {
+        provider.store$
         .connect()
         .pipe(
           Select((state) => state.messages),
           tap((state) => {
             expect(state).toEqual([]);
-            resolve();
           })
         )
         .subscribe();
-    });
+      }, 1000)
+    );
   });
 
   it('should test decorated store class', async () => {
