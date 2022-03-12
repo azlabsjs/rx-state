@@ -57,7 +57,9 @@ export default function reducer(state: MessageState, action: Action<any>) {
       } as MessageState;
     case '[MESSAGES_UPDATE]':
       const messages = [...state.messages];
-      const index = messages.findIndex(value => value.id === action.payload.id);
+      const index = messages.findIndex(
+        (value) => value.id === action.payload.id
+      );
       if (index !== 1) {
         messages.splice(index, 1, { ...messages[index], ...action.payload });
       }
@@ -96,7 +98,7 @@ class DummyStore extends FluxStore<number, Action<number>> {}
 const provider = new StoreProvider();
 
 describe('Rx state test definitions', () => {
-  it('Expect Store to be updated by value provided to action creator parameters', (done: jest.DoneCallback) => {
+  it('Expect Store to be updated by value provided to action creator parameters', async () => {
     const messagesAction = createAction(
       provider.store$,
       (messages: Partial<Message>[]) => {
@@ -106,7 +108,7 @@ describe('Rx state test definitions', () => {
         };
       }
     );
-    const updateAction = createAction(provider.store$, payload => {
+    const updateAction = createAction(provider.store$, (payload) => {
       return {
         type: '[MESSAGES_UPDATE]',
         payload,
@@ -119,7 +121,7 @@ describe('Rx state test definitions', () => {
           doLog(),
           delay(1000),
           map(
-            source =>
+            (source) =>
               ({
                 type: '[NEW_MESSAGE]',
                 payload: source,
@@ -148,81 +150,89 @@ describe('Rx state test definitions', () => {
     });
     resetStateAction(provider.store$)();
     errorAction(provider.store$)();
-    timeout(() => {
+    await new Promise<void>((resolve) => {
+      timeout(() => {
+        provider.store$
+          .connect()
+          .pipe()
+          .subscribe((value) => {
+            expect(value).toEqual([
+              {
+                id: '0023',
+                subject: 'Subject1 [UPDATED]',
+                content: 'New Message content',
+                destination: 'asmyns.platonnas29@gmail.com',
+              },
+              {
+                id: '00450',
+                subject: 'Loaded Message subject',
+                content: 'Loaded Message content',
+                destination: 'azandrewdevelopper@gmail.com',
+              },
+            ]);
+          });
+        resolve();
+      }, 2000);
+    });
+  });
+
+  it('Dispatch an action to the Messages Store', async () => {
+    Dispatch(provider.store$)({
+      type: '[EMPTY_STORE_MESSAGES]',
+    });
+
+    await new Promise<void>((resolve) => {
+      provider.store$
+        .select<Message[]>('messages')
+        .pipe(
+          tap((state) => {
+            expect(state).toEqual([]);
+            resolve();
+          })
+        )
+        .subscribe();
+    });
+  });
+
+  it('should return the list of messages when a selector is called on the state', async () => {
+    Dispatch(provider.store$)({
+      type: '[EMPTY_STORE_MESSAGES]',
+    });
+
+    await new Promise<void>((resolve) => {
       provider.store$
         .connect()
-        .pipe()
-        .subscribe(value => {
-          expect(value).toEqual([
-            {
-              id: '0023',
-              subject: 'Subject1 [UPDATED]',
-              content: 'New Message content',
-              destination: 'asmyns.platonnas29@gmail.com',
-            },
-            {
-              id: '00450',
-              subject: 'Loaded Message subject',
-              content: 'Loaded Message content',
-              destination: 'azandrewdevelopper@gmail.com',
-            },
-          ]);
-        });
-      done();
-    }, 2000);
-  });
-
-  it('Dispatch an action to the Messages Store', (done: jest.DoneCallback) => {
-    Dispatch(provider.store$)({
-      type: '[EMPTY_STORE_MESSAGES]',
+        .pipe(
+          Select((state) => state.messages),
+          tap((state) => {
+            expect(state).toEqual([]);
+            resolve();
+          })
+        )
+        .subscribe();
     });
-
-    provider.store$
-      .select<Message[]>('messages')
-      .pipe(
-        tap(state => {
-          expect(state).toEqual([]);
-          done();
-        })
-      )
-      .subscribe();
   });
 
-  it('should return the list of messages when a selector is called on the state', (done: jest.DoneCallback) => {
-    Dispatch(provider.store$)({
-      type: '[EMPTY_STORE_MESSAGES]',
-    });
-
-    provider.store$
-      .connect()
-      .pipe(
-        Select(state => state.messages),
-        tap(state => {
-          expect(state).toEqual([]);
-          done();
-        })
-      )
-      .subscribe();
-  });
-
-  it('should test decorated store class', (done: jest.DoneCallback) => {
+  it('should test decorated store class', async () => {
     const store = new DummyStore(
       createReducer({
-        '[INCREMENTS]': state => ++state,
-        '[DECREMENTS]': state => --state,
+        '[INCREMENTS]': (state) => ++state,
+        '[DECREMENTS]': (state) => --state,
       }),
       0
     );
     Dispatch(store)({ type: '[INCREMENTS]' });
     Dispatch(store)({ type: '[INCREMENTS]' });
-    store
-      .connect()
-      .pipe(
-        tap(state => {
-          expect(state).toEqual(2);
-          done();
-        })
-      )
-      .subscribe();
+    await new Promise<void>((resolve) => {
+      store
+        .connect()
+        .pipe(
+          tap((state) => {
+            expect(state).toEqual(2);
+            resolve();
+          })
+        )
+        .subscribe();
+    });
   });
 });

@@ -19,7 +19,7 @@ import {
 
 describe('Observable creation function', () => {
   it('should return an instance of RxJs observable', () => {
-    const observable = createObservable<string>(observer => {
+    const observable = createObservable<string>((observer) => {
       observer.next('Hello!');
     });
     expect(observable).toBeInstanceOf(Observable);
@@ -37,31 +37,29 @@ describe('Observable creation function', () => {
     expect(createStateful([])).toBeInstanceOf(BehaviorSubject);
   });
 
-  it('observableOf({}) should internally call of({})', async (done: jest.DoneCallback) => {
+  it('observableOf({}) should internally call of({})', async () => {
     const observable = observableOf({});
     expect(observable).toBeInstanceOf(Observable);
     const value = await lastValueFrom(observable);
     expect(value).toEqual({});
-    done();
   });
 
-  it('obserbableFrom({}) should internally call from({})', async (done: jest.DoneCallback) => {
+  it('obserbableFrom({}) should internally call from({})', async () => {
     const observable = observableFrom(
-      new Promise<string>(resolve => {
+      new Promise<string>((resolve) => {
         resolve('Hello World!');
       })
     );
     expect(observable).toBeInstanceOf(Observable);
     const value = await lastValueFrom(observable);
     expect(value).toEqual('Hello World!');
-    done();
   });
 
   it('isObservable(ObserableLike) should returns true', () => {
     expect(
       isObservable(
         observableFrom(
-          new Promise<void>(resolve => {
+          new Promise<void>((resolve) => {
             resolve();
           })
         )
@@ -73,12 +71,14 @@ describe('Observable creation function', () => {
     expect(empty()).toEqual(EMPTY);
   });
 
-  it('rxtimeout() should return an observable that run after the given timeout', (done: jest.DoneCallback) => {
-    const timeout = rxtimeout(() => {
-      expect(true).toBeTruthy();
-      done();
-    }, 1500);
-    expect(timeout).toBeInstanceOf(Observable);
-    timeout.subscribe();
+  it('rxtimeout() should return an observable that run after the given timeout', async () => {
+    await new Promise<void>((resolve) => {
+      const timeout = rxtimeout(() => {
+        expect(true).toBeTruthy();
+      }, 1500);
+      expect(timeout).toBeInstanceOf(Observable);
+      timeout.subscribe();
+      resolve();
+    });
   });
 });
