@@ -73,7 +73,7 @@ export const empty = () => observableFrom(EMPTY);
  * @param callback
  * @param ms
  */
-export const timeout = (callback: () => void, ms: number = 1000) =>
+export const timeout = (callback: () => void, ms = 1000) =>
   interval(ms)
     .pipe(first())
     .subscribe(() => callback());
@@ -84,7 +84,7 @@ export const timeout = (callback: () => void, ms: number = 1000) =>
  * @param callback
  * @param milliseconds
  */
-export const rxtimeout = (callback: () => void, milliseconds: number = 1000) =>
+export const rxtimeout = (callback: () => void, milliseconds = 1000) =>
   interval(milliseconds).pipe(
     first(),
     tap(() => callback())
@@ -152,7 +152,7 @@ export function lastValueFrom<T, D>(
         if (_hasValue) {
           resolve(_value);
         } else if (typeof config === 'object') {
-          resolve(config!.default);
+          resolve(config?.default);
         } else {
           reject(new EmptyError());
         }
@@ -214,7 +214,7 @@ export function firstValueFrom<T, D>(
   return new Promise<T | D>((resolve, reject) => {
     const _hasConfig = typeof config === 'object';
     source
-      .pipe(first(undefined, _hasConfig ? config!.default : undefined))
+      .pipe(first(undefined, _hasConfig ? config?.default : undefined))
       .subscribe({
         next: value => {
           resolve(value);
@@ -222,7 +222,7 @@ export function firstValueFrom<T, D>(
         error: reject,
         complete: () => {
           if (_hasConfig) {
-            resolve(config!.default);
+            resolve(config?.default);
           } else {
             reject(new EmptyError());
           }

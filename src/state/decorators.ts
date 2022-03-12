@@ -4,6 +4,8 @@ type PropsType = {
   name: string;
 };
 
-export const Store = (props: PropsType) => <T extends Object>(store: T) => {
-  return setStoreName(store, props.name) as T;
-};
+export const Store =
+  (props: PropsType) =>
+  <T extends Record<string, any> | object>(store: T) => {
+    return setStoreName(store, props.name) as T;
+  };

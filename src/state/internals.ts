@@ -8,11 +8,11 @@ const global_ = !(typeof global === 'undefined' || global === null)
 // @internal
 export const getStores = () => {
   global_['__DEV__'] = global_['__DEV__'] ?? {};
-  return (global_['__DEV__']['__STORES__'] as Map<Symbol, any>) ?? new Map();
+  return (global_['__DEV__']['__STORES__'] as Map<symbol, any>) ?? new Map();
 };
 
 // @internal
-export const setStores = (stores: Map<Symbol, any>) => {
+export const setStores = (stores: Map<symbol, any>) => {
   global_['__DEV__'] = global_['__DEV__'] ?? {};
   return (global_['__DEV__']['__STORES__'] = stores);
 };
@@ -21,13 +21,13 @@ export const setStores = (stores: Map<Symbol, any>) => {
 export const getStoreChanges = () => {
   global_['__DEV__'] = global_['__DEV__'] ?? {};
   return (
-    (global_['__DEV__']['__STATES__'] as Map<Symbol, Array<any[]>>) ??
+    (global_['__DEV__']['__STATES__'] as Map<symbol, Array<any[]>>) ??
     new Map<symbol, Array<any[]>>()
   );
 };
 
 // @internal
-export const setStoreChanges = (states: Map<Symbol, Array<any[]>>) => {
+export const setStoreChanges = (states: Map<symbol, Array<any[]>>) => {
   global_['__DEV__'] = global_['__DEV__'] ?? {};
   global_['__DEV__']['__STATES__'] = states;
 };
@@ -36,7 +36,7 @@ export const addStateChanges = (name: symbol, state: any[]) => {
   const changes =
     (getStoreChanges() as Map<symbol, Array<any[]>>) ??
     new Map<symbol, Array<any[]>>();
-  let states =
+  const states =
     (getStoreChanges().get(name) as Array<any[]>) ?? ([] as Array<any[]>);
   setStoreChanges(changes.set(name, [...states, state]));
 };
@@ -62,7 +62,7 @@ export const setStoreName = <T>(instance: T, name: string) => {
 export const getObjectProperty = <T extends { [prop: string]: any }>(
   source: T,
   key: string,
-  seperator: string = '.'
+  seperator = '.'
 ) => {
   if (
     key === '' ||
@@ -76,7 +76,7 @@ export const getObjectProperty = <T extends { [prop: string]: any }>(
   if (key.includes(seperator ?? '.')) {
     // Creates an array of inner properties
     const properties = key.split(seperator ?? '.');
-    let current = source;
+    const current = source;
     // Reduce the source object to a single value
     return properties.reduce((carry, prop) => {
       if (carry) {
