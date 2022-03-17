@@ -36,11 +36,10 @@ const dispatchAction = <T>(
  * @param store
  * @param handler
  */
-export const createAction = <T, A>(
-  store: Store<T, A>,
-  handler: ActionCreatorHandlerFn
-) => (...args: any[]) =>
-  dispatchAction(store, handler.call(null, ...args) as ActionType);
+export const createAction =
+  <T, A>(store: Store<T, A>, handler: ActionCreatorHandlerFn) =>
+  (...args: any[]) =>
+    dispatchAction(store, handler.call(null, ...args) as ActionType);
 
 /**
  * Creator function for creating a store object\
@@ -77,9 +76,10 @@ export const createStore = <T, A extends ActionType>(
  * @param store
  * @returns
  */
-export const Dispatch = <T, A>(store: Store<T, A>) => (
-  action: Action<T> | any
-) => dispatchAction(store, action);
+export const Dispatch =
+  <T, A>(store: Store<T, A>) =>
+  (action: Action<T> | any) =>
+    dispatchAction(store, action);
 
 /**
  * Runs stores destructor method on each store object in the global context
@@ -101,14 +101,14 @@ export function Select<T, V>(
 ): SelectorReturnType<T, V> {
   return (source$: Observable<T>) => {
     return source$.pipe(
-      map(state => {
+      map((state) => {
         if (typeof prop === 'function') {
           return prop(state);
         }
         if (typeof prop === 'string' && typeof state === 'object') {
           return getObjectProperty(state, prop) as V;
         }
-        return (state as any) as V;
+        return state as any as V;
       })
     );
   };

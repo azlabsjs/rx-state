@@ -15,7 +15,8 @@ import { Select } from './helpers';
 declare const ngDevMode: boolean;
 
 export class FluxStore<T, A extends ActionType>
-  implements Store<T, A>, SelectAware<T> {
+  implements Store<T, A>, SelectAware<T>
+{
   // @internal
   // Store internal state
   private readonly _state$ = createSubject<T>(1);
@@ -71,12 +72,12 @@ export class FluxStore<T, A extends ActionType>
     this._actions$
       .pipe(
         untilDestroyed(this, 'destroy'),
-        concatMap(action =>
+        concatMap((action) =>
           isObservable(action)
             ? (action as Observable<A>)
             : (observableOf<A>(action) as Observable<A>)
         ),
-        filter(state => typeof state !== 'undefined' && state !== null),
+        filter((state) => typeof state !== 'undefined' && state !== null),
         startWith(initial),
         scan((previous, current) => {
           if (ngDevMode || process?.env?.NODE_ENV !== 'production') {
@@ -84,7 +85,7 @@ export class FluxStore<T, A extends ActionType>
           }
           return reducer(previous as T, current as A);
         }),
-        tap(state => this._state$.next(state as T))
+        tap((state) => this._state$.next(state as T))
       )
       .subscribe();
   };

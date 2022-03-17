@@ -16,7 +16,8 @@
     "size": "size-limit",
     "analyze": "size-limit --why",
     "test": "jest",
-    "betterer": "betterer --strict"
+    "betterer": "betterer --strict",
+    "prettier": "prettier --write src/**/*"
   },
   "husky": {
     "hooks": {
@@ -58,6 +59,7 @@
   },
   "devDependencies": {
     "@betterer/cli": "^5.1.6",
+    "@betterer/typescript": "^5.1.6",
     "@iazlabs/ts-build": "^0.1.6",
     "@size-limit/preset-small-lib": "^7.0.8",
     "@types/jest": "^27.4.1",
@@ -75,6 +77,6 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
-    "@betterer/typescript": "^5.1.6"
+    "prettier": "^2.6.0"
   }
 }

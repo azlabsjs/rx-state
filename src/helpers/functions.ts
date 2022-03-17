@@ -143,7 +143,7 @@ export function lastValueFrom<T, D>(
     let _value: T;
     let _hasValue = false;
     source.subscribe({
-      next: value => {
+      next: (value) => {
         _value = value;
         _hasValue = true;
       },
@@ -216,7 +216,7 @@ export function firstValueFrom<T, D>(
     source
       .pipe(first(undefined, _hasConfig ? config?.default : undefined))
       .subscribe({
-        next: value => {
+        next: (value) => {
           resolve(value);
         },
         error: reject,

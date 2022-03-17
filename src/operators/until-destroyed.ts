@@ -53,7 +53,7 @@ const overrideJSClassMethod = (
 
   createSubjectOnTheInstance(instance, symbol);
 
-  instance[method] = function() {
+  instance[method] = function () {
     // eslint-disable-next-line prefer-rest-params
     originalDestroy.apply(this, arguments);
     completeSubjectOnTheInstance(this, symbol);
