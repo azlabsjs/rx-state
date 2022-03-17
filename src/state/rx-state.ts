@@ -15,7 +15,8 @@ import { Select } from './helpers';
 declare const ngDevMode: boolean;
 
 export class FluxStore<T, A extends ActionType>
-  implements Store<T, A>, SelectAware<T> {
+  implements Store<T, A>, SelectAware<T>
+{
   // @internal
   // Store internal state
   private readonly _state$ = createSubject<T>(1);
@@ -32,11 +33,25 @@ export class FluxStore<T, A extends ActionType>
     this.subscribeToActions(reducer, initial);
   }
 
+  /**
+   * Select part of the store object
+   * 
+   * @param prop 
+   */
   select = <RType>(prop: SelecPropType<T, RType>): Observable<RType> =>
     this.state$.pipe(Select(prop));
 
+  /**
+   * Dispatch an action to the store
+   *
+   * @param action
+   * @returns
+   */
   dispatch = (action: A | Observable<A>) => this._actions$.next(action);
 
+  /**
+   * Connect to store state to listen for state changes
+   */
   connect = () => this.state$;
 
   destroy() {
@@ -71,12 +86,12 @@ export class FluxStore<T, A extends ActionType>
     this._actions$
       .pipe(
         untilDestroyed(this, 'destroy'),
-        concatMap(action =>
+        concatMap((action) =>
           isObservable(action)
             ? (action as Observable<A>)
             : (observableOf<A>(action) as Observable<A>)
         ),
-        filter(state => typeof state !== 'undefined' && state !== null),
+        filter((state) => typeof state !== 'undefined' && state !== null),
         startWith(initial),
         scan((previous, current) => {
           if (ngDevMode || process?.env?.NODE_ENV !== 'production') {
@@ -84,7 +99,7 @@ export class FluxStore<T, A extends ActionType>
           }
           return reducer(previous as T, current as A);
         }),
-        tap(state => this._state$.next(state as T))
+        tap((state) => this._state$.next(state as T))
       )
       .subscribe();
   };

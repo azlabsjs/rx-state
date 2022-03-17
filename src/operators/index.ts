@@ -19,7 +19,7 @@ declare const ngDevMode: boolean;
 export const doLog = <T>(prefix?: string) => {
   return (source$: Observable<T>) =>
     source$.pipe(
-      tap(source => {
+      tap((source) => {
         // tslint:disable-next-line: no-unused-expression
         if (ngDevMode) {
           prefix ? console.log(prefix, source) : console.log(source);

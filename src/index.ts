@@ -14,7 +14,7 @@ export {
 } from './helpers';
 
 export {
-  createAction,
+  createActionDispatcher,
   createStore,
   Dispatch,
   errorAction,
@@ -28,12 +28,13 @@ export {
 
 // Type definitions
 export {
-  ActionCreatorHandlerFn,
-  ActionCreatorFn,
   Action,
+  ActionType,
   StateReducerFn,
+  ReducersConfig,
   Store as StoreInterface,
 } from './types';
 
 // Operators
 export { doLog } from './operators';
+export { createSelector, createSelectorFnCreator } from './selectors';

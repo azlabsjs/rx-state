@@ -1,0 +1,8 @@
+# Changes
+
+## [0.1.6] 2022-03-17
+
+- Add createSelector implementation 
+- Moved memoize implementation to utilities library
+- Rename createAction to createActionDispatcher
+- Fixed Circular dependency issue

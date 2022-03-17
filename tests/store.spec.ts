@@ -1,5 +1,5 @@
 import {
-  createAction,
+  createActionDispatcher,
   createStore,
   observableOf,
   Action,
@@ -96,7 +96,7 @@ class DummyStore extends FluxStore<number, Action<number>> {}
 describe('Rx state test definitions', () => {
   it('Expect Store to be updated by value provided to action creator parameters', async () => {
     const provider = new StoreProvider();
-    const messagesAction = createAction(
+    const messagesAction = createActionDispatcher(
       provider.store$,
       (messages: Partial<Message>[]) => {
         return {
@@ -105,13 +105,13 @@ describe('Rx state test definitions', () => {
         };
       }
     );
-    const updateAction = createAction(provider.store$, (payload) => {
+    const updateAction = createActionDispatcher(provider.store$, (payload) => {
       return {
         type: '[MESSAGES_UPDATE]',
         payload,
       };
     });
-    const asyncAction = createAction(provider.store$, (payload: Message) => {
+    const asyncAction = createActionDispatcher(provider.store$, (payload: Message) => {
       return {
         type: '[MESSAGES_LOADING]',
         payload: observableOf<Message>(payload).pipe(
