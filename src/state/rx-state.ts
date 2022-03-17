@@ -33,11 +33,25 @@ export class FluxStore<T, A extends ActionType>
     this.subscribeToActions(reducer, initial);
   }
 
+  /**
+   * Select part of the store object
+   * 
+   * @param prop 
+   */
   select = <RType>(prop: SelecPropType<T, RType>): Observable<RType> =>
     this.state$.pipe(Select(prop));
 
+  /**
+   * Dispatch an action to the store
+   *
+   * @param action
+   * @returns
+   */
   dispatch = (action: A | Observable<A>) => this._actions$.next(action);
 
+  /**
+   * Connect to store state to listen for state changes
+   */
   connect = () => this.state$;
 
   destroy() {

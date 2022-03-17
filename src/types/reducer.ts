@@ -1,16 +1,10 @@
-/**
- * Reducer function for store state
- */
+// @internal
 export type StateReducerFn<T, A> = (state: T, action: A) => T;
 
-/**
- * Takes a state a return the modify copy of the state or the state itself
- */
+// @internal
 export type PartialStateReducerFn<T> = (state: T) => T;
 
-/**
- * Create reducer parameter type definition
- */
+
 export type ReducersConfig<T, A> = {
   [index: string]: StateReducerFn<T, A>;
 };

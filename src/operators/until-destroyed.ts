@@ -1,6 +1,5 @@
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { createSubject } from '../helpers';
 import { DECORATOR_APPLIED, DESTROY } from './internals';
 
 // This will be provided through Terser global definitions by Angular CLI. This will
@@ -34,7 +33,7 @@ const completeSubjectOnTheInstance = (instance: any, symbol: symbol) => {
 
 const createSubjectOnTheInstance = (instance: any, symbol: symbol) => {
   if (!instance[symbol]) {
-    instance[symbol] = createSubject();
+    instance[symbol] = new Subject();
   }
 };
 

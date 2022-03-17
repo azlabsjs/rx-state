@@ -6,12 +6,7 @@ import {
   BehaviorSubject,
 } from 'rxjs';
 
-export {
-  ActionCreatorHandlerFn,
-  ActionCreatorFn,
-  Action,
-  ActionType,
-} from './actions';
+export { ActionCreatorHandlerFn, Action, ActionType } from './actions';
 
 // Reducers type defintion import
 export {

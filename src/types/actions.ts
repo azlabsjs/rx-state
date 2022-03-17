@@ -8,14 +8,11 @@ export interface Action<T> extends ActionType {
   payload?: T | Observable<ActionType>;
 }
 
-/**
- * Type definition of an action handler function
- */
-export type ActionCreatorHandlerFn = (...params: any[]) => ActionType;
+// @internal
+export type ActionCreatorHandlerFn<Params extends unknown[] = any[]> = (
+  ...params: Params
+) => ActionType;
 
-/**
- * Type definition of an action creator
- */
 export type ActionCreatorFn<A extends Partial<Action<any>>, K> = (
   handlerFunc: (...params: K[]) => A
 ) => A;

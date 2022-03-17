@@ -1,13 +1,7 @@
 // createSelector functions
 
-import { strictEquality } from './cache';
-import { memoize } from './memoize';
-import {
-  CreateSelectorOptions,
-  LeastType,
-  MemoizerOptions,
-  SelectorType,
-} from './types';
+import { memoize, MemoizerOptions, shallowEqual } from '@iazlabs/utilities';
+import { CreateSelectorOptions, LeastType, SelectorType } from './types';
 
 // Helpers
 // @internal
@@ -27,21 +21,22 @@ const getSelectorFuncs = (funcs: unknown[]) => {
 };
 // !Helpers
 
-function createSelectorFnCreator<
+export function createSelectorFnCreator<
   SelectorFn extends (...arg: unknown[]) => unknown,
   MemoizeFn extends (func: SelectorFn, options?: MemoizerOptions) => SelectorFn,
   SelectorMemoizeOption extends LeastType<Parameters<MemoizeFn>>
 >(memoizeFn: MemoizeFn, options?: LeastType<Parameters<MemoizeFn>>) {
-  return (...fn: ((...args: unknown[]) => unknown)[]) => {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  return (...selectors: Function[]) => {
     let lastResult!: unknown;
     let options_: CreateSelectorOptions<SelectorMemoizeOption> = {
       memoize: undefined,
     };
-    let lastArgument = fn.pop();
+    let lastArgument = selectors.pop();
     const lastArgumentType = typeof lastArgument;
     if (lastArgumentType === 'object') {
       options_ = lastArgument as any;
-      lastArgument = fn.pop();
+      lastArgument = selectors.pop();
     }
     if (lastArgumentType !== 'function') {
       throw new Error(
@@ -53,7 +48,7 @@ function createSelectorFnCreator<
     // but fall back to options given to createSelectorCreator.
     const { memoize: memoizeOptions = options } = options_;
 
-    const funcs = getSelectorFuncs(fn);
+    const funcs = getSelectorFuncs(selectors);
 
     const outputFunc = memoizeFn(
       function () {
@@ -147,8 +142,6 @@ function createSelectorFnCreator<
  *  )
  * @returns
  */
-export function createSelector() {
-  return createSelectorFnCreator(memoize, {
-    equality: { fn: strictEquality },
-  });
-}
+export const createSelector = createSelectorFnCreator(memoize, {
+  equality: { func: shallowEqual },
+});
