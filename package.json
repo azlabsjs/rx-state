@@ -43,11 +43,11 @@
   "size-limit": [
     {
       "path": "dist/cjs/index.js",
-      "limit": "10 KB"
+      "limit": "16 KB"
     },
     {
       "path": "dist/esm/index.js",
-      "limit": "10 KB"
+      "limit": "16 KB"
     }
   ],
   "publishConfig": {
