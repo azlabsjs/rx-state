@@ -6,3 +6,8 @@
 - Moved memoize implementation to utilities library
 - Rename createAction to createActionDispatcher
 - Fixed Circular dependency issue
+
+## [0.1.7] 2022-03-21
+
+- Fixed bug with incorrect type definitions path
+- Using memoize function from functional package instead of utilities
