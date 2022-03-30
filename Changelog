@@ -11,3 +11,7 @@
 
 - Fixed bug with incorrect type definitions path
 - Using memoize function from functional package instead of utilities
+
+## [0.1.9] 2022-03-30
+
+- Add local state management `useRxState() and useRxReducer()` functions inspired by react hooks
