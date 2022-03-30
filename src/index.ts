@@ -38,3 +38,6 @@ export {
 // Operators
 export { doLog } from './operators';
 export { createSelector, createSelectorFnCreator } from './selectors';
+
+// Local state management
+export { useRxReducer, useRxState } from './state/hooks';
