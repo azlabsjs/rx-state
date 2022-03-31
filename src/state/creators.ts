@@ -1,30 +1,11 @@
-import { isObservable } from 'rxjs';
 import {
   ActionCreatorHandlerFn as HandlerFn,
   ActionType,
   StateReducerFn,
   Store,
 } from '../types';
-import { setStoreName } from './internals';
+import { dispatchAction, setStoreName } from './internals';
 import { FluxStore } from './rx-state';
-
-// @internal
-export const dispatchAction = <T>(
-  store: Store<T, ActionType>,
-  action: ActionType | any
-) => {
-  // Return if the action is not defined performs nothing
-  if (typeof action === 'undefined' || action === null) {
-    return;
-  }
-  // Dipatch the action to the store
-  store.dispatch(action);
-  // If the action payload is set and payload is an observable, dispatch the payload as action as well
-  // in order to handle async action
-  if (isObservable(action?.payload)) {
-    store.dispatch(action.payload);
-  }
-};
 
 /**
  * Create a store action function that will be dispatch

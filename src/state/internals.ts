@@ -1,3 +1,6 @@
+import { isObservable } from 'rxjs';
+import { ActionType, Store } from '../types';
+
 // @internal Provides an instance of javascript global context
 const global_ = !(typeof global === 'undefined' || global === null)
   ? global
@@ -90,5 +93,23 @@ export const getObjectProperty = <T extends { [prop: string]: any }>(
     }, source);
   } else {
     return source ? source[key] : undefined;
+  }
+};
+
+// @internal
+export const dispatchAction = <T>(
+  store: Store<T, ActionType>,
+  action: ActionType | any
+) => {
+  // Return if the action is not defined performs nothing
+  if (typeof action === 'undefined' || action === null) {
+    return;
+  }
+  // Dipatch the action to the store
+  store.dispatch(action);
+  // If the action payload is set and payload is an observable, dispatch the payload as action as well
+  // in order to handle async action
+  if (isObservable(action?.payload)) {
+    store.dispatch(action.payload);
   }
 };

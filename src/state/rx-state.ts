@@ -46,35 +46,37 @@ export class FluxStore<T, A extends ActionType>
 
   public readonly actions$ = this._actions$.asObservable();
 
-  private _destroy$ = useRxEffect(
-    this._dispatch$.pipe(
-      concatMap((action) =>
-        isObservable(action)
-          ? (action as Observable<A>)
-          : (of<A>(action) as Observable<A>)
-      ),
-      distinctUntilChanged(),
-      tap((state) => this._actions$.next(state)),
-      filter((state) => typeof state !== 'undefined' && state !== null),
-      scan((previous, current) => {
-        if (ngDevMode || process?.env.NODE_ENV !== 'production') {
-          return this._applyReducer(this.reducer, previous, current);
-        }
-        return this.reducer(previous as T, current as A);
-      }, this.initial),
-      distinctUntilChanged(),
-      tap((state) => this._state$.next(state as T))
-    ),
-    () => {
-      // Unsubscribe to state updates
-      if (!this._state$.closed) {
-        this._state$.complete();
-      }
-    }
-  );
+  private _destroy$!: any;
 
   // Instance initializer
-  constructor(private reducer: StateReducerFn<T, A>, private initial: T) {}
+  constructor(private reducer: StateReducerFn<T, A>, initial: T) {
+    this._destroy$ = useRxEffect(
+      this._dispatch$.pipe(
+        concatMap((action) =>
+          isObservable(action)
+            ? (action as Observable<A>)
+            : (of<A>(action) as Observable<A>)
+        ),
+        distinctUntilChanged(),
+        tap((state) => this._actions$.next(state)),
+        filter((state) => typeof state !== 'undefined' && state !== null),
+        scan((previous, current) => {
+          if (ngDevMode || process?.env.NODE_ENV !== 'production') {
+            return this._applyReducer(this.reducer, previous, current);
+          }
+          return this.reducer(previous as T, current as A);
+        }, initial),
+        distinctUntilChanged(),
+        tap((state) => this._state$.next(state as T))
+      ),
+      () => {
+        // Unsubscribe to state updates
+        if (!this._state$.closed) {
+          this._state$.complete();
+        }
+      }
+    );
+  }
 
   /**
    * Select part of the store object

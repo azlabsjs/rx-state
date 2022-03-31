@@ -8,8 +8,7 @@ import {
   StateReducerFn,
   Store,
 } from '../types';
-import { dispatchAction } from './creators';
-import { getObjectProperty, getStores } from './internals';
+import { dispatchAction, getObjectProperty, getStores } from './internals';
 
 /**
  * Create a store action dispatcher callable on a {@see Store} object
