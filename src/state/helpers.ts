@@ -1,7 +1,6 @@
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import {
-  Action,
   ActionType,
   ReducersConfig,
   SelecPropType,
@@ -9,7 +8,7 @@ import {
   StateReducerFn,
   Store,
 } from '../types';
-import { createActionDispatcher } from './creators';
+import { dispatchAction } from './creators';
 import { getObjectProperty, getStores } from './internals';
 
 /**
@@ -19,15 +18,16 @@ import { getObjectProperty, getStores } from './internals';
  * const store = createStore((state, action) => {...}, { ... }, 'examples');
  *
  * // Dispatch an action to the store
- * Dispatch(store)({type: '[EXAMPLES_LIST]', payload: [...]});
+ * useDispatch(store)({type: '[EXAMPLES_LIST]', payload: [...]});
  *
  * @param store
- * @returns
+ *
  */
-export const Dispatch =
-  <T, A>(store: Store<T, A>) =>
-  (action: Action<T> | any) =>
-    createActionDispatcher(store, action);
+export function useDispatch<T, A>(store: Store<T, A>) {
+  return (action: A) => {
+    return dispatchAction(store, action);
+  };
+}
 
 /**
  * Runs stores destructor method on each store object in the global context
@@ -54,11 +54,31 @@ export function Select<T, V = unknown>(
           return prop(state);
         }
         if (typeof prop === 'string' && typeof state === 'object') {
-          console.log(prop, state);
           return getObjectProperty(state as any, prop) as V;
         }
         return state as any as V;
       })
+    );
+  };
+}
+
+/**
+ * Creates an RxJS operator for filtering store actions
+ * based on the developper provided type
+ *
+ * @param action
+ */
+export function ofType(action: ActionType | string) {
+  return (source: Observable<ActionType>) => {
+    return source.pipe(
+      filter(
+        (state) =>
+          typeof action !== 'undefined' &&
+          action !== null &&
+          (typeof action === 'string'
+            ? state.type === action
+            : state.type === action?.type)
+      )
     );
   };
 }

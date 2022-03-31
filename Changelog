@@ -15,3 +15,11 @@
 ## [0.1.9] 2022-03-30
 
 - Add local state management `useRxState() and useRxReducer()` functions inspired by react hooks
+
+
+## [0.1.10] 2022-03-31
+
+- Add useRxEffect function for running side effects
+- Rename Dispatch to useDispatch
+- Fixed bug in old Dispatch method implementation
+- Bug fix in Store decorator

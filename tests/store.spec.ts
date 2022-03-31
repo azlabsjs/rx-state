@@ -3,12 +3,12 @@ import {
   createStore,
   observableOf,
   Action,
-  Dispatch,
+  useDispatch,
   Store,
   createReducer,
   Select,
 } from '../src';
-import { delay, first, map, tap } from 'rxjs/operators';
+import { delay, map, first, tap } from 'rxjs/operators';
 import { FluxStore } from '../src/state';
 import { interval, lastValueFrom } from 'rxjs';
 
@@ -176,7 +176,7 @@ describe('Rx state test definitions', () => {
 
   it('Dispatch an action to the Messages Store', async () => {
     const provider2 = new StoreProvider();
-    Dispatch(provider2.store$)({
+    useDispatch(provider2.store$)({
       type: '[EMPTY_STORE_MESSAGES]',
     });
 
@@ -199,7 +199,7 @@ describe('Rx state test definitions', () => {
 
   it('should return the list of messages when a selector is called on the state', async () => {
     const provider3 = new StoreProvider();
-    Dispatch(provider3.store$)({
+    useDispatch(provider3.store$)({
       type: '[EMPTY_STORE_MESSAGES]',
     });
 
@@ -229,8 +229,9 @@ describe('Rx state test definitions', () => {
       }),
       0
     );
-    Dispatch(store)({ type: '[INCREMENTS]' });
-    Dispatch(store)({ type: '[INCREMENTS]' });
+    useDispatch(store)({ type: '[INCREMENTS]' });
+    useDispatch(store)({ type: '[INCREMENTS]' });
+
     await lastValueFrom(
       interval(1000).pipe(
         first(),
