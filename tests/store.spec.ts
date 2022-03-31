@@ -3,15 +3,14 @@ import {
   createStore,
   observableOf,
   Action,
-  Dispatch,
+  useDispatch,
   Store,
   createReducer,
   Select,
-  rxtimeout,
 } from '../src';
-import { delay, map, tap } from 'rxjs/operators';
+import { delay, map, first, tap } from 'rxjs/operators';
 import { FluxStore } from '../src/state';
-import { lastValueFrom } from 'rxjs';
+import { interval, lastValueFrom } from 'rxjs';
 
 // @internal Provides an instance of javascript global context
 const global_ = !(typeof global === 'undefined' || global === null)
@@ -95,9 +94,9 @@ class DummyStore extends FluxStore<number, Action<number>> {}
 
 describe('Rx state test definitions', () => {
   it('Expect Store to be updated by value provided to action creator parameters', async () => {
-    const provider = new StoreProvider();
+    const provider1 = new StoreProvider();
     const messagesAction = createActionDispatcher(
-      provider.store$,
+      provider1.store$,
       (messages: Partial<Message>[]) => {
         return {
           type: '[MESSAGES_LOADED]',
@@ -105,27 +104,30 @@ describe('Rx state test definitions', () => {
         };
       }
     );
-    const updateAction = createActionDispatcher(provider.store$, (payload) => {
+    const updateAction = createActionDispatcher(provider1.store$, (payload) => {
       return {
         type: '[MESSAGES_UPDATE]',
         payload,
       };
     });
-    const asyncAction = createActionDispatcher(provider.store$, (payload: Message) => {
-      return {
-        type: '[MESSAGES_LOADING]',
-        payload: observableOf<Message>(payload).pipe(
-          delay(1000),
-          map(
-            (source) =>
-              ({
-                type: '[NEW_MESSAGE]',
-                payload: source,
-              } as Partial<Action<Message>>)
-          )
-        ),
-      };
-    });
+    const asyncAction = createActionDispatcher(
+      provider1.store$,
+      (payload: Message) => {
+        return {
+          type: '[MESSAGES_LOADING]',
+          payload: observableOf<Message>(payload).pipe(
+            delay(1000),
+            map(
+              (source) =>
+                ({
+                  type: '[NEW_MESSAGE]',
+                  payload: source,
+                } as Partial<Action<Message>>)
+            )
+          ),
+        };
+      }
+    );
     messagesAction([
       {
         id: '0023',
@@ -145,68 +147,77 @@ describe('Rx state test definitions', () => {
       destination: 'azandrewdevelopper@gmail.com',
     });
     await lastValueFrom(
-      rxtimeout(() => {
-        provider.store$
-          .connect()
-          .pipe()
-          .subscribe((value) => {
-            expect(value.messages).toEqual([
-              {
-                id: '0023',
-                subject: 'Subject1 [UPDATED]',
-                content: 'New Message content',
-                destination: 'asmyns.platonnas29@gmail.com',
-              },
-              {
-                id: '00450',
-                subject: 'Loaded Message subject',
-                content: 'Loaded Message content',
-                destination: 'azandrewdevelopper@gmail.com',
-              },
-            ]);
-          });
-      }, 1000)
+      interval(1000).pipe(
+        first(),
+        tap(() => {
+          provider1.store$
+            .connect()
+            .pipe()
+            .subscribe((value) => {
+              expect(value.messages).toEqual([
+                {
+                  id: '0023',
+                  subject: 'Subject1 [UPDATED]',
+                  content: 'New Message content',
+                  destination: 'asmyns.platonnas29@gmail.com',
+                },
+                {
+                  id: '00450',
+                  subject: 'Loaded Message subject',
+                  content: 'Loaded Message content',
+                  destination: 'azandrewdevelopper@gmail.com',
+                },
+              ]);
+            });
+        })
+      )
     );
   });
 
   it('Dispatch an action to the Messages Store', async () => {
-    const provider = new StoreProvider();
-    Dispatch(provider.store$)({
+    const provider2 = new StoreProvider();
+    useDispatch(provider2.store$)({
       type: '[EMPTY_STORE_MESSAGES]',
     });
 
     await lastValueFrom(
-      rxtimeout(() => {
-        provider.store$
-          .select<Message[]>('messages')
-          .pipe(
-            tap((state) => {
-              expect(state).toEqual([]);
-            })
-          )
-          .subscribe();
-      }, 1000)
+      interval(1000).pipe(
+        first(),
+        tap(() => {
+          provider2.store$
+            .select<Message[]>('messages')
+            .pipe(
+              tap((state) => {
+                expect(state).toEqual([]);
+              })
+            )
+            .subscribe();
+        })
+      )
     );
   });
 
   it('should return the list of messages when a selector is called on the state', async () => {
-    const provider = new StoreProvider();
-    Dispatch(provider.store$)({
+    const provider3 = new StoreProvider();
+    useDispatch(provider3.store$)({
       type: '[EMPTY_STORE_MESSAGES]',
     });
 
     await lastValueFrom(
-      rxtimeout(() => {
-        provider.store$
-        .connect()
-        .pipe(
-          Select((state) => state.messages),
-          tap((state) => {
-            expect(state).toEqual([]);
-          })
-        )
-        .subscribe();
-      }, 1000)
+      interval(1000).pipe(
+        first(),
+        tap(() => {
+          provider3.store$
+            .connect()
+            .pipe(
+              Select((state) => state.messages),
+              tap((state) => {
+                expect(state).toEqual([]);
+              })
+            )
+            .subscribe();
+        })
+      )
     );
   });
 
@@ -218,18 +229,23 @@ describe('Rx state test definitions', () => {
       }),
       0
     );
-    Dispatch(store)({ type: '[INCREMENTS]' });
-    Dispatch(store)({ type: '[INCREMENTS]' });
-    await new Promise<void>((resolve) => {
-      store
-        .connect()
-        .pipe(
-          tap((state) => {
-            expect(state).toEqual(2);
-            resolve();
-          })
-        )
-        .subscribe();
-    });
+    useDispatch(store)({ type: '[INCREMENTS]' });
+    useDispatch(store)({ type: '[INCREMENTS]' });
+
+    await lastValueFrom(
+      interval(1000).pipe(
+        first(),
+        tap(() => {
+          store
+            .connect()
+            .pipe(
+              tap((state) => {
+                expect(state).toEqual(2);
+              })
+            )
+            .subscribe();
+        })
+      )
+    );
   });
 });

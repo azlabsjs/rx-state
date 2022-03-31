@@ -1,7 +1,18 @@
-import { createSubject, observableOf } from '../helpers';
-import { isObservable, Observable } from 'rxjs';
-import { scan, filter, startWith, concatMap, tap } from 'rxjs/operators';
-import { untilDestroyed } from '../operators';
+import {
+  isObservable,
+  Observable,
+  of,
+  OperatorFunction,
+  ReplaySubject,
+  Subject,
+} from 'rxjs';
+import {
+  scan,
+  filter,
+  concatMap,
+  tap,
+  distinctUntilChanged,
+} from 'rxjs/operators';
 import {
   ActionType,
   SelecPropType,
@@ -11,6 +22,7 @@ import {
 } from '../types';
 import { addStateChanges } from './internals';
 import { Select } from './helpers';
+import { useRxEffect } from './hooks';
 
 declare const ngDevMode: boolean;
 
@@ -19,88 +31,84 @@ export class FluxStore<T, A extends ActionType>
 {
   // @internal
   // Store internal state
-  private readonly _state$ = createSubject<T>(1);
+  private readonly _state$ = new ReplaySubject<T>(1);
 
   // tslint:disable-next-line: variable-name
   state$: Observable<T> = this._state$.asObservable();
 
   // @internal
   // tslint:disable-next-line: variable-name
-  private _actions$ = createSubject<A | Observable<A>>();
+  // Internal action dispatcher subject for passing control
+  // internal state handler
+  private _dispatch$ = new Subject<A | Observable<A>>();
+
+  private _actions$ = new ReplaySubject<A>();
+
+  public readonly actions$ = this._actions$.asObservable();
+
+  private _destroy$!: any;
 
   // Instance initializer
-  constructor(reducer: StateReducerFn<T, A>, initial: T) {
-    this.subscribeToActions(reducer, initial);
+  constructor(private reducer: StateReducerFn<T, A>, initial: T) {
+    this._destroy$ = useRxEffect(
+      this._dispatch$.pipe(
+        concatMap((action) =>
+          isObservable(action)
+            ? (action as Observable<A>)
+            : (of<A>(action) as Observable<A>)
+        ),
+        distinctUntilChanged(),
+        tap((state) => this._actions$.next(state)),
+        filter((state) => typeof state !== 'undefined' && state !== null),
+        scan((previous, current) => {
+          if (ngDevMode || process?.env.NODE_ENV !== 'production') {
+            return this._applyReducer(this.reducer, previous, current);
+          }
+          return this.reducer(previous as T, current as A);
+        }, initial),
+        distinctUntilChanged(),
+        tap((state) => this._state$.next(state as T))
+      ),
+      () => {
+        // Unsubscribe to state updates
+        if (!this._state$.closed) {
+          this._state$.complete();
+        }
+      }
+    );
   }
 
   /**
    * Select part of the store object
-   * 
-   * @param prop 
-   */
-  select = <RType>(prop: SelecPropType<T, RType>): Observable<RType> =>
-    this.state$.pipe(Select(prop));
-
-  /**
-   * Dispatch an action to the store
    *
-   * @param action
-   * @returns
+   * @param prop
    */
-  dispatch = (action: A | Observable<A>) => this._actions$.next(action);
+  select = <R>(prop: SelecPropType<T, R>) =>
+    this.state$.pipe(Select(prop) as OperatorFunction<T, R>);
 
-  /**
-   * Connect to store state to listen for state changes
-   */
+  dispatch(action: A | Observable<A>) {
+    this._dispatch$.next(action);
+  }
+
   connect = () => this.state$;
 
   destroy() {
-    // TODO : In future release check if this should be done
-    this._state$.complete();
+    this._destroy$.complete();
   }
 
   // @internal
   private _applyReducer = (
     reducer: StateReducerFn<T, A>,
-    previous: any,
-    current: any
+    previous: T,
+    current: A
   ) => {
-    const type = (current as A)?.type;
-    if (typeof type === 'undefined' || type === null) {
-      return reducer(previous as T, current as A);
+    if (typeof current?.type === 'undefined' || current?.type === null) {
+      return reducer(previous, current);
     }
-    const nextState = reducer(previous as T, current as A);
+    const nextState = reducer(previous, current);
     if ('name' in this) {
-      addStateChanges(
-        ((store: { [prop: string]: any }) => {
-          return store['name'];
-        })(this),
-        [type, previous as T, nextState as T]
-      );
+      addStateChanges(this['name'], [current?.type, previous, nextState]);
     }
     return nextState;
-  };
-
-  // @internal
-  private subscribeToActions = (reducer: StateReducerFn<T, A>, initial: T) => {
-    this._actions$
-      .pipe(
-        untilDestroyed(this, 'destroy'),
-        concatMap((action) =>
-          isObservable(action)
-            ? (action as Observable<A>)
-            : (observableOf<A>(action) as Observable<A>)
-        ),
-        filter((state) => typeof state !== 'undefined' && state !== null),
-        startWith(initial),
-        scan((previous, current) => {
-          if (ngDevMode || process?.env?.NODE_ENV !== 'production') {
-            this._applyReducer(reducer, previous, current);
-          }
-          return reducer(previous as T, current as A);
-        }),
-        tap((state) => this._state$.next(state as T))
-      )
-      .subscribe();
   };
 }

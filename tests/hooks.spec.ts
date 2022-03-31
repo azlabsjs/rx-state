@@ -1,11 +1,33 @@
 import { interval, lastValueFrom, Subject } from 'rxjs';
 import { tap, takeUntil, first } from 'rxjs/operators';
-import { useRxReducer, useRxState } from '../src';
+import {
+  Action,
+  Store,
+  useRxReducer,
+  useRxState,
+  createReducer,
+  useDispatch,
+  ofType,
+  useRxEffect
+} from '../src';
+import { FluxStore } from '../src/state';
 
-jest.setTimeout(10000);
+// @internal Provides an instance of javascript global context
+const global_ = !(typeof global === 'undefined' || global === null)
+  ? global
+  : !(typeof window === 'undefined' || window === null)
+  ? window
+  : ({} as any);
+
+global_.ngDevMode = false;
+
+@Store({
+  name: 'dummy',
+})
+class DummyStore extends FluxStore<number, Action<number>> {}
 
 describe('Test hooks implementation', () => {
-  it('states should contains the initial state and the last emitted state value', async() => {
+  it('states should contains the initial state and the last emitted state value', async () => {
     const states: number[][] = [];
     const [state, setState] = useRxState<number[]>([], 1);
     const _done$ = new Subject<void>();
@@ -20,18 +42,19 @@ describe('Test hooks implementation', () => {
       )
       .subscribe();
 
-    await lastValueFrom(interval(1000)
-      .pipe(
+    await lastValueFrom(
+      interval(1000).pipe(
         first(),
         tap(() => {
           expect(states[0]).toEqual([]);
           expect(states[1]).toEqual([1, 23, 5, 6]);
           _done$.next();
         })
-      ));
+      )
+    );
   });
 
-  it('states should contains all changes on the local state object', async() => {
+  it('states should contains all changes on the local state object', async () => {
     const changes: object[] = [];
     const [car, setCar] = useRxState({
       brand: 'Ford',
@@ -115,6 +138,36 @@ describe('Test hooks implementation', () => {
           expect(changes[3]).toEqual([1, 2, 4]);
           expect(changes[4]).toEqual([1, 2]);
         })
+      )
+    );
+  });
+
+  // useRxEffect tests
+  it('should return false for the last disptached action is [DECREMENTS] by ofType filter [INCREMENTS] actions', async () => {
+    let lastAction: String;
+    const store = new DummyStore(
+      createReducer({
+        '[INCREMENTS]': (state) => {
+          return ++state;
+        },
+        '[DECREMENTS]': (state) => --state,
+      }),
+      0
+    );
+    useDispatch(store)({ type: '[INCREMENTS]' });
+    useDispatch(store)({ type: '[INCREMENTS]' });
+    useDispatch(store)({ type: '[DECREMENTS]' });
+
+    useRxEffect(
+      store.actions$.pipe(
+        ofType('[INCREMENTS]'),
+        tap((state) => (lastAction = state.type))
+      )
+    );
+    await lastValueFrom(
+      interval(2000).pipe(
+        first(),
+        tap(() => expect(lastAction).not.toEqual('[DECREMENTS]'))
       )
     );
   });

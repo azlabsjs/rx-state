@@ -16,7 +16,7 @@ export {
 export {
   createActionDispatcher,
   createStore,
-  Dispatch,
+  useDispatch,
   errorAction,
   asyncAction,
   resetStateAction,
@@ -24,6 +24,7 @@ export {
   Destroy,
   createReducer,
   Select,
+  ofType,
 } from './state';
 
 // Type definitions
@@ -37,7 +38,6 @@ export {
 
 // Operators
 export { doLog } from './operators';
-export { createSelector, createSelectorFnCreator } from './selectors';
 
 // Local state management
-export { useRxReducer, useRxState } from './state/hooks';
+export { useRxReducer, useRxState, useRxEffect } from './state/hooks';

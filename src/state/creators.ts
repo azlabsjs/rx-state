@@ -1,26 +1,26 @@
 import {
-  ActionCreatorHandlerFn,
+  ActionCreatorHandlerFn as HandlerFn,
   ActionType,
   StateReducerFn,
   Store,
 } from '../types';
-import { dispatchAction } from './helpers';
-import { setStoreName } from './internals';
+import { dispatchAction, setStoreName } from './internals';
 import { FluxStore } from './rx-state';
 
 /**
- * Create a store action function that will be dispatch to the store when called on a given argumen
+ * Create a store action function that will be dispatch
+ * to the store when called on a given argumen
  *
  * @param store
  * @param handler
  */
 export const createActionDispatcher =
-  <T, A, Params extends unknown[] = any[]>(
-    store: Store<T, A>,
-    handler: ActionCreatorHandlerFn
+  <T, A, S extends Store<T, A>, P extends unknown[] = any[]>(
+    store: S,
+    handler: HandlerFn
   ) =>
-  (...args: Params) =>
-    dispatchAction(store, handler.call(null, ...args) as ActionType);
+  (...args: P) =>
+    dispatchAction(store, handler(...args) as ActionType);
 
 /**
  * Creator function for creating a store object\
