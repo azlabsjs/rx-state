@@ -1,4 +1,4 @@
-import { isObservable, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
   Action,
@@ -9,25 +9,8 @@ import {
   StateReducerFn,
   Store,
 } from '../types';
+import { createActionDispatcher } from './creators';
 import { getObjectProperty, getStores } from './internals';
-
-// @internal
-export const dispatchAction = <T>(
-  store: Store<T, ActionType>,
-  action: ActionType | any
-) => {
-  // Return if the action is not defined performs nothing
-  if (typeof action === 'undefined' || action === null) {
-    return;
-  }
-  // Dipatch the action to the store
-  store.dispatch(action);
-  // If the action payload is set and payload is an observable, dispatch the payload as action as well
-  // in order to handle async action
-  if (isObservable(action?.payload)) {
-    store.dispatch(action.payload);
-  }
-};
 
 /**
  * Create a store action dispatcher callable on a {@see Store} object
@@ -44,7 +27,7 @@ export const dispatchAction = <T>(
 export const Dispatch =
   <T, A>(store: Store<T, A>) =>
   (action: Action<T> | any) =>
-    dispatchAction(store, action);
+    createActionDispatcher(store, action);
 
 /**
  * Runs stores destructor method on each store object in the global context
@@ -61,7 +44,7 @@ export const Destroy = () =>
     }
   });
 
-export function Select<T, V>(
+export function Select<T, V = unknown>(
   prop?: SelecPropType<T, V>
 ): SelectorReturnType<T, V> {
   return (source$: Observable<T>) => {
@@ -71,7 +54,8 @@ export function Select<T, V>(
           return prop(state);
         }
         if (typeof prop === 'string' && typeof state === 'object') {
-          return getObjectProperty(state, prop) as V;
+          console.log(prop, state);
+          return getObjectProperty(state as any, prop) as V;
         }
         return state as any as V;
       })
@@ -106,7 +90,7 @@ export function Select<T, V>(
  *
  * @param config
  */
-export function createReducer<T, A extends ActionType>(
+export function createReducer<T, A extends ActionType = any>(
   config: ReducersConfig<T, A>
 ): StateReducerFn<T, A> {
   return (state: T, action: A) => {

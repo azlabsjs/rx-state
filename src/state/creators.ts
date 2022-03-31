@@ -1,26 +1,45 @@
+import { isObservable } from 'rxjs';
 import {
-  ActionCreatorHandlerFn,
+  ActionCreatorHandlerFn as HandlerFn,
   ActionType,
   StateReducerFn,
   Store,
 } from '../types';
-import { dispatchAction } from './helpers';
 import { setStoreName } from './internals';
 import { FluxStore } from './rx-state';
 
+// @internal
+export const dispatchAction = <T>(
+  store: Store<T, ActionType>,
+  action: ActionType | any
+) => {
+  // Return if the action is not defined performs nothing
+  if (typeof action === 'undefined' || action === null) {
+    return;
+  }
+  // Dipatch the action to the store
+  store.dispatch(action);
+  // If the action payload is set and payload is an observable, dispatch the payload as action as well
+  // in order to handle async action
+  if (isObservable(action?.payload)) {
+    store.dispatch(action.payload);
+  }
+};
+
 /**
- * Create a store action function that will be dispatch to the store when called on a given argumen
+ * Create a store action function that will be dispatch
+ * to the store when called on a given argumen
  *
  * @param store
  * @param handler
  */
 export const createActionDispatcher =
-  <T, A, Params extends unknown[] = any[]>(
-    store: Store<T, A>,
-    handler: ActionCreatorHandlerFn
+  <T, A, S extends Store<T, A>, P extends unknown[] = any[]>(
+    store: S,
+    handler: HandlerFn
   ) =>
-  (...args: Params) =>
-    dispatchAction(store, handler.call(null, ...args) as ActionType);
+  (...args: P) =>
+    dispatchAction(store, handler(...args) as ActionType);
 
 /**
  * Creator function for creating a store object\

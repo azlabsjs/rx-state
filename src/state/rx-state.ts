@@ -1,6 +1,12 @@
 import { createSubject, observableOf } from '../helpers';
-import { isObservable, Observable } from 'rxjs';
-import { scan, filter, startWith, concatMap, tap } from 'rxjs/operators';
+import { isObservable, Observable, OperatorFunction } from 'rxjs';
+import {
+  scan,
+  filter,
+  concatMap,
+  tap,
+  distinctUntilChanged,
+} from 'rxjs/operators';
 import { untilDestroyed } from '../operators';
 import {
   ActionType,
@@ -35,11 +41,11 @@ export class FluxStore<T, A extends ActionType>
 
   /**
    * Select part of the store object
-   * 
-   * @param prop 
+   *
+   * @param prop
    */
-  select = <RType>(prop: SelecPropType<T, RType>): Observable<RType> =>
-    this.state$.pipe(Select(prop));
+  select = <R>(prop: SelecPropType<T, R>) =>
+    this.state$.pipe(Select(prop) as OperatorFunction<T, R>);
 
   /**
    * Dispatch an action to the store
@@ -56,7 +62,9 @@ export class FluxStore<T, A extends ActionType>
 
   destroy() {
     // TODO : In future release check if this should be done
-    this._state$.complete();
+    if (!this._state$.closed) {
+      this._state$.complete();
+    }
   }
 
   // @internal
@@ -92,13 +100,13 @@ export class FluxStore<T, A extends ActionType>
             : (observableOf<A>(action) as Observable<A>)
         ),
         filter((state) => typeof state !== 'undefined' && state !== null),
-        startWith(initial),
         scan((previous, current) => {
-          if (ngDevMode || process?.env?.NODE_ENV !== 'production') {
-            this._applyReducer(reducer, previous, current);
+          if (ngDevMode || process?.env.NODE_ENV !== 'production') {
+            return this._applyReducer(reducer, previous, current);
           }
           return reducer(previous as T, current as A);
-        }),
+        }, initial),
+        distinctUntilChanged(),
         tap((state) => this._state$.next(state as T))
       )
       .subscribe();
