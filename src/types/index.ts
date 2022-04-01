@@ -29,15 +29,3 @@ export type CreateSubjectFunc<T> = (
 export type ObserverHandlerFunc<T> = (
   subscriber: Subscriber<T>
 ) => TeardownLogic;
-
-/**
- * @description Create observable type definition
- */
-export type CreateObservableFunc<T> = (
-  handler?: ObserverHandlerFunc<T>
-) => Observable<T>;
-
-/**
- * @description Type definition for result of a given handler function
- */
-export type HandlerResult<T> = { data: T };
