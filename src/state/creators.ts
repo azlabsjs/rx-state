@@ -4,7 +4,7 @@ import {
   StateReducerFn,
   Store,
 } from '../types';
-import { dispatchAction, setStoreName } from './internals';
+import { dispatchAction, setStoreName } from '../internals/rx-state';
 import { FluxStore } from './rx-state';
 
 /**

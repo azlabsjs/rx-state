@@ -1,4 +1,4 @@
-import { setStoreName } from './internals';
+import { setStoreName } from '../internals/rx-state';
 
 type PropsType = {
   name: string;

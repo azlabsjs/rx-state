@@ -1,10 +1,7 @@
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ___RX_STATE__DEV__ } from '../internals/dev';
 import { DECORATOR_APPLIED, DESTROY } from './internals';
-
-// This will be provided through Terser global definitions by Angular CLI. This will
-// help to tree-shake away the code unneeded for production bundles.
-declare const ngDevMode: boolean;
 
 /**
  * If we use the `untilDestroyed` operator multiple times inside the single
@@ -44,7 +41,7 @@ const overrideJSClassMethod = (
 ) => {
   const originalDestroy = instance[method];
 
-  if (ngDevMode && typeof originalDestroy !== 'function') {
+  if (___RX_STATE__DEV__ && typeof originalDestroy !== 'function') {
     throw new Error(
       `${instance.constructor.name} is using untilDestroyed() but doesn't implement ${method}`
     );
@@ -84,7 +81,7 @@ export const untilDestroyed = <T>(instance: T, method?: keyof T) => {
     if (typeof method === 'string') {
       overrideJSClassMethod(instance, method, symbol);
     } else {
-      ngDevMode && ensureClassIsDecorated(instance);
+      ___RX_STATE__DEV__ && ensureClassIsDecorated(instance);
       createSubjectOnTheInstance(instance, symbol);
     }
 

@@ -8,18 +8,9 @@ import {
   createReducer,
   useDispatch,
   ofType,
-  useRxEffect
+  useRxEffect,
 } from '../src';
 import { FluxStore } from '../src/state';
-
-// @internal Provides an instance of javascript global context
-const global_ = !(typeof global === 'undefined' || global === null)
-  ? global
-  : !(typeof window === 'undefined' || window === null)
-  ? window
-  : ({} as any);
-
-global_.ngDevMode = false;
 
 @Store({
   name: 'dummy',

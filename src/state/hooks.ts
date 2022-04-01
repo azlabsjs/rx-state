@@ -6,8 +6,9 @@ import {
   scan,
   startWith,
   takeUntil,
-  // tap,
 } from 'rxjs/operators';
+import { Store } from '../types';
+import { completeSubject, dispatchAction, getSymbol } from '../internals/rx-state';
 
 type SetStateFunctionType<T> = (state: T) => T;
 type UseStateReturnType<T> = readonly [
@@ -177,26 +178,6 @@ export function useRxReducer<T, ActionType = any>(
   return [state, dispatch] as UseReducerReturnType<T, ActionType>;
 }
 
-// @internal
-function getSymbol<T>(method?: keyof T): symbol {
-  if (typeof method === 'string') {
-    return Symbol(`__unsubscribe__${method}`);
-  } else {
-    return Symbol('__unsubscribe__');
-  }
-}
-
-// @internal
-function completeSubject(instance: any, prop: symbol) {
-  if (instance[prop]) {
-    instance[prop].next();
-    instance[prop].complete();
-    // We also have to re-assign this property thus in the future
-    // we will be able to create new subject on the same instance.
-    instance[prop] = undefined;
-  }
-}
-
 /**
  * {@see useEffect} tries to abstract away subsription and unsubscription
  * flows of RxJS observables by using completable function that when
@@ -277,4 +258,22 @@ export function useRxEffect<T>(source: Observable<T>, destruct?: JsFunction) {
     },
   }) as any as JsFunction &
     Pick<{ complete: (...args: any[]) => unknown }, 'complete'>;
+}
+
+/**
+ * Create a store action dispatcher callable on a {@see Store} object
+ *
+ * @example
+ * const store = createStore((state, action) => {...}, { ... }, 'examples');
+ *
+ * // Dispatch an action to the store
+ * useDispatch(store)({type: '[EXAMPLES_LIST]', payload: [...]});
+ *
+ * @param store
+ *
+ */
+export function useDispatch<T, A>(store: Store<T, A>) {
+  return (action: A) => {
+    return dispatchAction(store, action);
+  };
 }

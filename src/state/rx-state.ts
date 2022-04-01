@@ -20,11 +20,10 @@ import {
   StateReducerFn,
   Store,
 } from '../types';
-import { addStateChanges } from './internals';
-import { Select } from './helpers';
+import { addStateChanges } from '../internals/rx-state';
 import { useRxEffect } from './hooks';
-
-declare const ngDevMode: boolean;
+import { Select } from '../operators/rx-state';
+import { ___RX_STATE__DEV__ } from '../internals/dev';
 
 export class FluxStore<T, A extends ActionType>
   implements Store<T, A>, SelectAware<T>
@@ -42,8 +41,14 @@ export class FluxStore<T, A extends ActionType>
   // internal state handler
   private _dispatch$ = new Subject<A | Observable<A>>();
 
+  // @internal
+  // Internal action cache that memoized action dispatched though
+  // the lifetime of the store
   private _actions$ = new ReplaySubject<A>();
 
+  // @internal
+  // Dispatched actions observable cache that developpers can subscribe to
+  // to execute side effects based on action type
   public readonly actions$ = this._actions$.asObservable();
 
   private _destroy$!: any;
@@ -61,7 +66,7 @@ export class FluxStore<T, A extends ActionType>
         tap((state) => this._actions$.next(state)),
         filter((state) => typeof state !== 'undefined' && state !== null),
         scan((previous, current) => {
-          if (ngDevMode || process?.env.NODE_ENV !== 'production') {
+          if (___RX_STATE__DEV__ || process?.env.NODE_ENV !== 'production') {
             return this._applyReducer(this.reducer, previous, current);
           }
           return this.reducer(previous as T, current as A);
@@ -80,12 +85,41 @@ export class FluxStore<T, A extends ActionType>
 
   /**
    * Select part of the store object
+   * 
+   * **Warning**
+   * The implementation provides a key based or function based selection
+   * function. For performance reason avoid performing having computation
+   * when you provide function.
+   * For long running selector, or heavy compution selector, use {@see rxSelect}
+   * from the @iazlabs/rx-select library or use any memoized selector implementation
    *
    * @param prop
    */
   select = <R>(prop: SelecPropType<T, R>) =>
     this.state$.pipe(Select(prop) as OperatorFunction<T, R>);
 
+  /**
+   * Dispatch an action into the store
+   * 
+   * There is a functional insterface which create a dispatcher function
+   * by wrapping the store with a {@see useDispatch} method
+   * 
+   * ```js
+   * import {useDispatch} from '@iazlabs/rx-state';
+   * 
+   * // ...
+   * 
+   * const dispatch = useDispatch(store); // The store object was previously
+   * // created by an above code
+   * 
+   * // Dispatching a action
+   * dispatch({
+   *  type: '[INCREMENTS]'
+   * });
+   * ```
+   * 
+   * @param action 
+   */
   dispatch(action: A | Observable<A>) {
     this._dispatch$.next(action);
   }
