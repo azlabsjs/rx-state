@@ -21,9 +21,9 @@ import {
   Store,
 } from '../types';
 import { addStateChanges } from '../internals/rx-state';
-import { useRxEffect } from './hooks';
 import { Select } from '../operators/rx-state';
 import { ___RX_STATE__DEV__ } from '../internals/dev';
+import { useRxEffect } from '@iazlabs/rx-hooks';
 
 export class FluxStore<T, A extends ActionType>
   implements Store<T, A>, SelectAware<T>
@@ -85,7 +85,7 @@ export class FluxStore<T, A extends ActionType>
 
   /**
    * Select part of the store object
-   * 
+   *
    * **Warning**
    * The implementation provides a key based or function based selection
    * function. For performance reason avoid performing having computation
@@ -100,25 +100,25 @@ export class FluxStore<T, A extends ActionType>
 
   /**
    * Dispatch an action into the store
-   * 
+   *
    * There is a functional insterface which create a dispatcher function
    * by wrapping the store with a {@see useDispatch} method
-   * 
+   *
    * ```js
    * import {useDispatch} from '@iazlabs/rx-state';
-   * 
+   *
    * // ...
-   * 
+   *
    * const dispatch = useDispatch(store); // The store object was previously
    * // created by an above code
-   * 
+   *
    * // Dispatching a action
    * dispatch({
    *  type: '[INCREMENTS]'
    * });
    * ```
-   * 
-   * @param action 
+   *
+   * @param action
    */
   dispatch(action: A | Observable<A>) {
     this._dispatch$.next(action);

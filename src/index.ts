@@ -22,9 +22,6 @@ export {
   Store,
   Destroy,
   createReducer,
-  useRxReducer,
-  useRxState,
-  useRxEffect,
   useDispatch,
 } from './state';
 

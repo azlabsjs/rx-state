@@ -10,7 +10,7 @@ import {
 import { delay, map, first, tap } from 'rxjs/operators';
 import { FluxStore } from '../src/state';
 import { interval, lastValueFrom } from 'rxjs';
-import { Select } from '../src/helpers/operators';
+import { Select } from '../src/operators';
 
 class Message {
   id!: string;
