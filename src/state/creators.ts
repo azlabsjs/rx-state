@@ -4,10 +4,11 @@ import {
   StateReducerFn,
   Store,
 } from '../types';
-import { dispatchAction, setStoreName } from './internals';
+import { dispatchAction, setStoreName } from '../internals/rx-state';
 import { FluxStore } from './rx-state';
 
 /**
+ * @deprecated
  * Create a store action function that will be dispatch
  * to the store when called on a given argumen
  *

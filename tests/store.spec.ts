@@ -6,20 +6,11 @@ import {
   useDispatch,
   Store,
   createReducer,
-  Select,
 } from '../src';
 import { delay, map, first, tap } from 'rxjs/operators';
 import { FluxStore } from '../src/state';
 import { interval, lastValueFrom } from 'rxjs';
-
-// @internal Provides an instance of javascript global context
-const global_ = !(typeof global === 'undefined' || global === null)
-  ? global
-  : !(typeof window === 'undefined' || window === null)
-  ? window
-  : ({} as any);
-
-global_.ngDevMode = false;
+import { Select } from '../src/operators';
 
 class Message {
   id!: string;
