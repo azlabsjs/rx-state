@@ -51,11 +51,9 @@ export class FluxStore<T, A extends ActionType>
   // to execute side effects based on action type
   public readonly actions$ = this._actions$.asObservable();
 
-  private _destroy$!: any;
-
   // Instance initializer
   constructor(private reducer: StateReducerFn<T, A>, initial: T) {
-    this._destroy$ = useRxEffect(
+    useRxEffect(
       this._dispatch$.pipe(
         concatMap((action) =>
           isObservable(action)
@@ -74,12 +72,7 @@ export class FluxStore<T, A extends ActionType>
         distinctUntilChanged(),
         tap((state) => this._state$.next(state as T))
       ),
-      () => {
-        // Unsubscribe to state updates
-        if (!this._state$.closed) {
-          this._state$.complete();
-        }
-      }
+      [this, 'destroy']
     );
   }
 
@@ -126,8 +119,11 @@ export class FluxStore<T, A extends ActionType>
 
   connect = () => this.state$;
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   destroy() {
-    this._destroy$.complete();
+    if (!this._state$.closed) {
+      this._state$.complete();
+    }
   }
 
   // @internal
