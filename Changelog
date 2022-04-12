@@ -26,3 +26,8 @@
 ## [0.1.12] 2022-03-31
 
 - Moved useRxEffect, useRxReducer and useRxState into a dedicated package
+
+## [0.1.13] 2022-04-12
+
+- Updated @iazlabs/rx-hooks to 0.1.3
+- use new implementation of useRxEffect()
