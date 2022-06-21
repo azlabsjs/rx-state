@@ -23,7 +23,7 @@ import {
 import { addStateChanges } from '../internals/rx-state';
 import { Select } from '../operators/rx-state';
 import { ___RX_STATE__DEV__ } from '../internals/dev';
-import { useRxEffect } from '@iazlabs/rx-hooks';
+import { useRxEffect } from '@azlabsjs/rx-hooks';
 
 export class FluxStore<T, A extends ActionType>
   implements Store<T, A>, SelectAware<T>
@@ -51,11 +51,9 @@ export class FluxStore<T, A extends ActionType>
   // to execute side effects based on action type
   public readonly actions$ = this._actions$.asObservable();
 
-  private _destroy$!: any;
-
   // Instance initializer
   constructor(private reducer: StateReducerFn<T, A>, initial: T) {
-    this._destroy$ = useRxEffect(
+    useRxEffect(
       this._dispatch$.pipe(
         concatMap((action) =>
           isObservable(action)
@@ -74,12 +72,7 @@ export class FluxStore<T, A extends ActionType>
         distinctUntilChanged(),
         tap((state) => this._state$.next(state as T))
       ),
-      () => {
-        // Unsubscribe to state updates
-        if (!this._state$.closed) {
-          this._state$.complete();
-        }
-      }
+      [this, 'destroy']
     );
   }
 
@@ -91,7 +84,7 @@ export class FluxStore<T, A extends ActionType>
    * function. For performance reason avoid performing having computation
    * when you provide function.
    * For long running selector, or heavy compution selector, use {@see rxSelect}
-   * from the @iazlabs/rx-select library or use any memoized selector implementation
+   * from the @azlabsjs/rx-select library or use any memoized selector implementation
    *
    * @param prop
    */
@@ -105,7 +98,7 @@ export class FluxStore<T, A extends ActionType>
    * by wrapping the store with a {@see useDispatch} method
    *
    * ```js
-   * import {useDispatch} from '@iazlabs/rx-state';
+   * import {useDispatch} from '@azlabsjs/rx-state';
    *
    * // ...
    *
@@ -127,7 +120,10 @@ export class FluxStore<T, A extends ActionType>
   connect = () => this.state$;
 
   destroy() {
-    this._destroy$.complete();
+    // Unsubscribe to state updates
+    if (!this._state$.closed) {
+      this._state$.complete();
+    }
   }
 
   // @internal
