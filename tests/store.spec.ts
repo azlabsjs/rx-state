@@ -6,6 +6,8 @@ import {
   useDispatch,
   Store,
   createReducer,
+  ActionType,
+  StoreType,
 } from '../src';
 import { delay, map, first, tap } from 'rxjs/operators';
 import { FluxStore } from '../src/state';
@@ -67,8 +69,8 @@ export default function reducer(state: MessageState, action: Action<any>) {
   }
 }
 
-class StoreProvider {
-  store$ = createStore(
+function StoreProvider() {
+  const store = createStore(
     reducer,
     {
       isLoading: false,
@@ -76,6 +78,10 @@ class StoreProvider {
     },
     'messages'
   );
+  return [store, useDispatch(store)] as [
+    StoreType<MessageState, ActionType>,
+    (action: ActionType) => void
+  ];
 }
 
 @Store({
@@ -85,9 +91,9 @@ class DummyStore extends FluxStore<number, Action<number>> {}
 
 describe('Rx state test definitions', () => {
   it('Expect Store to be updated by value provided to action creator parameters', async () => {
-    const provider1 = new StoreProvider();
+    const [store] = StoreProvider();
     const messagesAction = createActionDispatcher(
-      provider1.store$,
+      store,
       (messages: Partial<Message>[]) => {
         return {
           type: '[MESSAGES_LOADED]',
@@ -95,30 +101,27 @@ describe('Rx state test definitions', () => {
         };
       }
     );
-    const updateAction = createActionDispatcher(provider1.store$, (payload) => {
+    const updateAction = createActionDispatcher(store, (payload) => {
       return {
         type: '[MESSAGES_UPDATE]',
         payload,
       };
     });
-    const asyncAction = createActionDispatcher(
-      provider1.store$,
-      (payload: Message) => {
-        return {
-          type: '[MESSAGES_LOADING]',
-          payload: observableOf<Message>(payload).pipe(
-            delay(1000),
-            map(
-              (source) =>
-                ({
-                  type: '[NEW_MESSAGE]',
-                  payload: source,
-                } as Partial<Action<Message>>)
-            )
-          ),
-        };
-      }
-    );
+    const asyncAction = createActionDispatcher(store, (payload: Message) => {
+      return {
+        type: '[MESSAGES_LOADING]',
+        payload: observableOf<Message>(payload).pipe(
+          delay(1000),
+          map(
+            (source) =>
+              ({
+                type: '[NEW_MESSAGE]',
+                payload: source,
+              } as Partial<Action<Message>>)
+          )
+        ),
+      };
+    });
     messagesAction([
       {
         id: '0023',
@@ -141,7 +144,7 @@ describe('Rx state test definitions', () => {
       interval(1000).pipe(
         first(),
         tap(() => {
-          provider1.store$
+          store
             .connect()
             .pipe()
             .subscribe((value) => {
@@ -166,8 +169,8 @@ describe('Rx state test definitions', () => {
   });
 
   it('Dispatch an action to the Messages Store', async () => {
-    const provider2 = new StoreProvider();
-    useDispatch(provider2.store$)({
+    const [store, dispatch] = StoreProvider();
+    dispatch({
       type: '[EMPTY_STORE_MESSAGES]',
     });
 
@@ -175,7 +178,7 @@ describe('Rx state test definitions', () => {
       interval(1000).pipe(
         first(),
         tap(() => {
-          provider2.store$
+          store
             .select<Message[]>('messages')
             .pipe(
               tap((state) => {
@@ -189,8 +192,8 @@ describe('Rx state test definitions', () => {
   });
 
   it('should return the list of messages when a selector is called on the state', async () => {
-    const provider3 = new StoreProvider();
-    useDispatch(provider3.store$)({
+    const [store, dispatch] = StoreProvider();
+    dispatch({
       type: '[EMPTY_STORE_MESSAGES]',
     });
 
@@ -198,7 +201,7 @@ describe('Rx state test definitions', () => {
       interval(1000).pipe(
         first(),
         tap(() => {
-          provider3.store$
+          store
             .connect()
             .pipe(
               Select((state) => state.messages),
@@ -220,8 +223,9 @@ describe('Rx state test definitions', () => {
       }),
       0
     );
-    useDispatch(store)({ type: '[INCREMENTS]' });
-    useDispatch(store)({ type: '[INCREMENTS]' });
+    const dispatch = useDispatch(store);
+    dispatch({ type: '[INCREMENTS]' });
+    dispatch({ type: '[INCREMENTS]' });
 
     await lastValueFrom(
       interval(1000).pipe(

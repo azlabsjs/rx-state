@@ -37,11 +37,13 @@ export const createActionDispatcher =
  * @param initial
  * @param name
  */
-export const createStore = <T, A extends ActionType>(
+export function createStore<T, A extends ActionType>(
   reducer: StateReducerFn<T, A>,
-  initial: T,
-  name: string | undefined = undefined
-) =>
-  name
-    ? (setStoreName(new FluxStore(reducer, initial), name) as FluxStore<T, A>)
-    : new FluxStore(reducer, initial);
+  initial?: T,
+  name?: string
+) {
+  const store = name
+    ? setStoreName(new FluxStore(reducer, (initial || {}) as T), name)
+    : new FluxStore(reducer, (initial || {}) as T);
+  return store as Store<T, A>;
+}

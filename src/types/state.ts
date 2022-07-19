@@ -25,6 +25,8 @@ export interface Store<T, A> {
    */
   connect(): Observable<T>;
 
+  select<R>(prop: SelecPropType<T, R>): Observable<R>;
+
   /**
    * Provides a destruction mechanism to the store
    *

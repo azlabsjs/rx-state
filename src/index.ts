@@ -16,9 +16,6 @@ export {
 export {
   createActionDispatcher,
   createStore,
-  errorAction,
-  asyncAction,
-  resetStateAction,
   Store,
   Destroy,
   createReducer,
@@ -31,7 +28,7 @@ export {
   ActionType,
   StateReducerFn,
   ReducersConfig,
-  Store as StoreInterface,
+  Store as StoreType,
 } from './types';
 
 // Operators
