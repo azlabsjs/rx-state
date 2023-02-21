@@ -16,7 +16,6 @@
     "size": "size-limit",
     "analyze": "size-limit --why",
     "test": "jest",
-    "betterer": "betterer --strict",
     "prettier": "prettier --write src/**/*"
   },
   "husky": {
@@ -54,7 +53,7 @@
     "registry": "https://npm.pkg.github.com/@azlabsjs"
   },
   "dependencies": {
-    "@azlabsjs/functional": "^0.1.10",
+    "@azlabsjs/functional": "^0.2.0",
     "@azlabsjs/utilities": "^0.1.10",
     "@azlabsjs/rx-hooks": "^0.2.0"
   },
@@ -62,8 +61,6 @@
     "rxjs": "^6.6.7 || ^7.0"
   },
   "devDependencies": {
-    "@betterer/cli": "^5.1.6",
-    "@betterer/typescript": "^5.1.6",
     "@azlabsjs/ts-build": "^0.1.16",
     "prettier": "^2.6.0",
     "@size-limit/preset-small-lib": "^7.0.8",

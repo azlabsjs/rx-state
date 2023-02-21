@@ -1,29 +1,25 @@
+import { useRxEffect } from '@azlabsjs/rx-hooks';
 import {
   isObservable,
   Observable,
   of,
   OperatorFunction,
   ReplaySubject,
-  Subject,
+  Subject
 } from 'rxjs';
 import {
-  scan,
-  filter,
-  concatMap,
-  tap,
-  distinctUntilChanged,
+  concatMap, distinctUntilChanged, filter, scan, tap
 } from 'rxjs/operators';
+import { ___RX_STATE__DEV__ } from '../internals/dev';
+import { addStateChanges } from '../internals/rx-state';
+import { Select } from '../operators/rx-state';
 import {
   ActionType,
   SelecPropType,
   SelectAware,
   StateReducerFn,
-  Store,
+  Store
 } from '../types';
-import { addStateChanges } from '../internals/rx-state';
-import { Select } from '../operators/rx-state';
-import { ___RX_STATE__DEV__ } from '../internals/dev';
-import { useRxEffect } from '@azlabsjs/rx-hooks';
 
 export class FluxStore<T, A extends ActionType>
   implements Store<T, A>, SelectAware<T>
@@ -137,7 +133,7 @@ export class FluxStore<T, A extends ActionType>
     }
     const nextState = reducer(previous, current);
     if ('name' in this) {
-      addStateChanges(this['name'], [current?.type, previous, nextState]);
+      addStateChanges(this['name'] as symbol, [current?.type, previous, nextState]);
     }
     return nextState;
   };
