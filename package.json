@@ -1,5 +1,5 @@
 {
-  "version": "0.1.14",
+  "version": "0.2.0",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/types/index.d.ts",
@@ -56,7 +56,7 @@
   "dependencies": {
     "@azlabsjs/functional": "^0.1.10",
     "@azlabsjs/utilities": "^0.1.10",
-    "@azlabsjs/rx-hooks": "^0.1.10"
+    "@azlabsjs/rx-hooks": "^0.2.0"
   },
   "peerDependencies": {
     "rxjs": "^6.6.7 || ^7.0"
