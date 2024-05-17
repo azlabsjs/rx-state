@@ -1,7 +1,11 @@
 {
   "version": "0.2.1",
   "license": "MIT",
+  "name": "@azlabsjs/rx-state",
+  "author": "azandrew-sidoine",
+  "module": "dist/esm/index.mjs",
   "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
   "typings": "dist/types/index.d.ts",
   "files": [
     "dist/**/*"
@@ -14,7 +18,6 @@
     "lint": "ts-build lint",
     "prepare": "git config core.hookspath .githooks && ts-build build",
     "size": "size-limit",
-    "analyze": "size-limit --why",
     "test": "jest",
     "prettier": "prettier --write src/**/*"
   },
@@ -31,14 +34,16 @@
   },
   "exports": {
     ".": {
-      "import": "./dist/esm/index.mjs",
-      "require": "./dist/cjs/index.cjs",
-      "default": "./dist/cjs/index.cjs"
+      "import": {
+        "types": "./dist/types/index.d.mts",
+        "default": "./dist/esm/index.mjs"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/cjs/index.cjs"
+      }
     }
   },
-  "name": "@azlabsjs/rx-state",
-  "author": "azandrew-sidoine",
-  "module": "dist/esm/index.mjs",
   "size-limit": [
     {
       "path": "dist/cjs/index.cjs",
@@ -54,16 +59,17 @@
   },
   "dependencies": {
     "@azlabsjs/functional": "^0.2.0",
-    "@azlabsjs/utilities": "^0.1.10",
+    "@azlabsjs/utilities": "^0.2.0",
     "@azlabsjs/rx-hooks": "^0.2.0"
   },
   "peerDependencies": {
     "rxjs": "^6.6.7 || ^7.0"
   },
   "devDependencies": {
-    "@azlabsjs/ts-build": "^0.1.16",
+    "@azlabsjs/ts-build": "^0.4.21",
+    "size-limit": "^11.1.4",
+    "@size-limit/preset-small-lib": "^11.1.4",
     "prettier": "^2.6.0",
-    "@size-limit/preset-small-lib": "^7.0.8",
     "@types/jest": "^27.4.1",
     "@typescript-eslint/eslint-plugin": "^5.12.1",
     "@typescript-eslint/parser": "^5.12.1",
@@ -73,7 +79,6 @@
     "lint-staged": "^12.3.5",
     "rxjs": "^6.6.7 || ^7.0",
     "rxjs-compat": "^6.6.7",
-    "size-limit": "^7.0.8",
     "ts-jest": "^27.1.3",
     "tslib": "^2.3.1",
     "typescript": "^4.5.5"

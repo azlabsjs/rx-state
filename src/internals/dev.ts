@@ -5,9 +5,9 @@ declare const ngDevMode: boolean;
 let devMode: boolean;
 
 if (typeof ngDevMode === 'undefined' || ngDevMode === null) {
-    devMode = process.env.NODE_ENV !== 'production'
+  devMode = process.env.NODE_ENV !== 'production';
 } else {
-    devMode = ngDevMode;
+  devMode = ngDevMode;
 }
 
 // @internal

@@ -2,7 +2,6 @@ import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { ___RX_STATE__DEV__ } from '../internals/dev';
 
-
 // Helper rxjs operator for logging emitted stream while running in development mode
 /**
  * @description Helper rxjs operator for logging emitted stream while running in development mode

@@ -5,10 +5,14 @@ import {
   of,
   OperatorFunction,
   ReplaySubject,
-  Subject
+  Subject,
 } from 'rxjs';
 import {
-  concatMap, distinctUntilChanged, filter, scan, tap
+  concatMap,
+  distinctUntilChanged,
+  filter,
+  scan,
+  tap,
 } from 'rxjs/operators';
 import { ___RX_STATE__DEV__ } from '../internals/dev';
 import { addStateChanges } from '../internals/rx-state';
@@ -18,7 +22,7 @@ import {
   SelecPropType,
   SelectAware,
   StateReducerFn,
-  Store
+  Store,
 } from '../types';
 
 export class FluxStore<T, A extends ActionType>
@@ -133,7 +137,11 @@ export class FluxStore<T, A extends ActionType>
     }
     const nextState = reducer(previous, current);
     if ('name' in this) {
-      addStateChanges(this['name'] as symbol, [current?.type, previous, nextState]);
+      addStateChanges(this['name'] as symbol, [
+        current?.type,
+        previous,
+        nextState,
+      ]);
     }
     return nextState;
   };

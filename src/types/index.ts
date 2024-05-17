@@ -1,9 +1,4 @@
-import {
-  Subject,
-  Subscriber,
-  TeardownLogic,
-  BehaviorSubject,
-} from 'rxjs';
+import { Subject, Subscriber, TeardownLogic, BehaviorSubject } from 'rxjs';
 
 export { ActionCreatorHandlerFn, Action, ActionType } from './actions';
 

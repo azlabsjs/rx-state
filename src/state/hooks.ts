@@ -1,4 +1,3 @@
-
 import { dispatchAction } from '../internals/rx-state';
 import { Store } from '../types';
 
