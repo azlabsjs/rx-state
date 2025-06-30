@@ -52,7 +52,10 @@ export class FluxStore<T, A extends ActionType>
   public readonly actions$ = this._actions$.asObservable();
 
   // Instance initializer
-  constructor(private reducer: StateReducerFn<T, A>, initial: T) {
+  constructor(
+    private reducer: StateReducerFn<T, A>,
+    initial: T
+  ) {
     useRxEffect(
       this._dispatch$.pipe(
         concatMap((action) =>
@@ -65,7 +68,7 @@ export class FluxStore<T, A extends ActionType>
         filter((state) => typeof state !== 'undefined' && state !== null),
         scan((previous, current) => {
           if (___RX_STATE__DEV__ || process?.env.NODE_ENV !== 'production') {
-            return this._applyReducer(this.reducer, previous, current);
+            return this.reduce(this.reducer, previous, current);
           }
           return this.reducer(previous as T, current as A);
         }, initial),
@@ -88,8 +91,9 @@ export class FluxStore<T, A extends ActionType>
    *
    * @param prop
    */
-  select = <R>(prop: SelecPropType<T, R>) =>
-    this.state$.pipe(Select(prop) as OperatorFunction<T, R>);
+  select<R>(prop: SelecPropType<T, R>) {
+    return this.state$.pipe(Select(prop) as OperatorFunction<T, R>);
+  }
 
   /**
    * Dispatch an action into the store
@@ -117,7 +121,9 @@ export class FluxStore<T, A extends ActionType>
     this._dispatch$.next(action);
   }
 
-  connect = () => this.state$;
+  connect() {
+    return this.state$;
+  }
 
   destroy() {
     // Unsubscribe to state updates
@@ -127,11 +133,11 @@ export class FluxStore<T, A extends ActionType>
   }
 
   // @internal
-  private _applyReducer = (
+  private reduce(
     reducer: StateReducerFn<T, A>,
     previous: T,
     current: A
-  ) => {
+  ) {
     if (typeof current?.type === 'undefined' || current?.type === null) {
       return reducer(previous, current);
     }
@@ -144,5 +150,5 @@ export class FluxStore<T, A extends ActionType>
       ]);
     }
     return nextState;
-  };
+  }
 }

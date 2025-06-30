@@ -1,4 +1,9 @@
 import { ActionType, ReducersConfig, StateReducerFn } from '../types';
+
+/** @internal */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type UnknownType = any;
+
 /**
  * Create a state reducer function that can use use in {@see Store<T,A>}
  * as reducer using configurations from a object
@@ -26,7 +31,7 @@ import { ActionType, ReducersConfig, StateReducerFn } from '../types';
  *
  * @param config
  */
-export function createReducer<T, A extends ActionType = any>(
+export function createReducer<T, A extends ActionType = UnknownType>(
   config: ReducersConfig<T, A>
 ): StateReducerFn<T, A> {
   return (state: T, action: A) => {

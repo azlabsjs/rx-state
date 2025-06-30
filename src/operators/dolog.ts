@@ -19,6 +19,7 @@ export const doLog = <T>(prefix?: string) => {
       tap((source) => {
         // tslint:disable-next-line: no-unused-expression
         if (___RX_STATE__DEV__) {
+          // eslint-disable-next-line @typescript-eslint/no-unused-expressions
           prefix ? console.log(prefix, source) : console.log(source);
         }
       })

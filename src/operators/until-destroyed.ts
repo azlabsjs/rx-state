@@ -3,6 +3,10 @@ import { takeUntil } from 'rxjs/operators';
 import { ___RX_STATE__DEV__ } from '../internals/dev';
 import { DECORATOR_APPLIED, DESTROY } from './internals';
 
+/** @internal */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type UnknownType = any;
+
 /**
  * If we use the `untilDestroyed` operator multiple times inside the single
  * instance providing different `destroyMethodName`, then all streams will
@@ -18,27 +22,34 @@ function getSymbol<T>(method?: keyof T): symbol {
   }
 }
 
-const completeSubjectOnTheInstance = (instance: any, symbol: symbol) => {
+function completeSubjectOnTheInstance(
+  instance: Record<number | string | symbol, UnknownType>,
+  symbol: symbol
+) {
   if (instance[symbol]) {
     instance[symbol].next();
     instance[symbol].complete();
+
     // We also have to re-assign this property thus in the future
     // we will be able to create new subject on the same instance.
     instance[symbol] = undefined;
   }
-};
+}
 
-const createSubjectOnTheInstance = (instance: any, symbol: symbol) => {
+function createSubjectOnTheInstance(
+  instance: Record<number | string | symbol, UnknownType>,
+  symbol: symbol
+) {
   if (!instance[symbol]) {
     instance[symbol] = new Subject();
   }
-};
+}
 
-const overrideJSClassMethod = (
-  instance: any,
+function overrideClassMethod(
+  instance: Record<number | string | symbol, UnknownType>,
   method: string,
   symbol: symbol
-) => {
+) {
   const originalDestroy = instance[method];
 
   if (___RX_STATE__DEV__ && typeof originalDestroy !== 'function') {
@@ -59,9 +70,12 @@ const overrideJSClassMethod = (
     // method again and not the patched one.
     instance[method] = originalDestroy;
   };
-};
+}
 
-const ensureClassIsDecorated = (instance: InstanceType<any>) => {
+function ensureClassIsDecorated(instance: InstanceType<UnknownType>) {
+  if (!___RX_STATE__DEV__) {
+    return;
+  }
   const prototype = Object.getPrototypeOf(instance);
   const missingDecorator = !(DECORATOR_APPLIED in prototype);
 
@@ -71,7 +85,7 @@ const ensureClassIsDecorated = (instance: InstanceType<any>) => {
         'components or providers that are not decorated with UntilDestroy decorator'
     );
   }
-};
+}
 
 export const untilDestroyed = <T>(instance: T, method?: keyof T) => {
   return <U>(source: Observable<U>) => {
@@ -79,12 +93,23 @@ export const untilDestroyed = <T>(instance: T, method?: keyof T) => {
     // If `method` is passed then the developer applies
     // this operator to something non-related to Angular DI system
     if (typeof method === 'string') {
-      overrideJSClassMethod(instance, method, symbol);
+      overrideClassMethod(
+        instance as Record<number | string | symbol, UnknownType>,
+        method,
+        symbol
+      );
     } else {
-      ___RX_STATE__DEV__ && ensureClassIsDecorated(instance);
-      createSubjectOnTheInstance(instance, symbol);
+      ensureClassIsDecorated(instance);
+      createSubjectOnTheInstance(
+        instance as Record<number | string | symbol, UnknownType>,
+        symbol
+      );
     }
 
-    return source.pipe(takeUntil<U>((instance as any)[symbol]));
+    return source.pipe(
+      takeUntil<U>(
+        (instance as Record<number | string | symbol, UnknownType>)[symbol]
+      )
+    );
   };
 };

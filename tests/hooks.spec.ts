@@ -11,7 +11,7 @@ class DummyStore extends FluxStore<number, Action<number>> {}
 describe('Test hooks implementation', () => {
   // useRxEffect tests
   it('should return false for the last disptached action is [DECREMENTS] by ofType filter [INCREMENTS] actions', async () => {
-    let lastAction: String;
+    let lastAction: string;
     const store = new DummyStore(
       createReducer({
         '[INCREMENTS]': (state) => {

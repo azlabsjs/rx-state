@@ -1,6 +1,7 @@
 import { filter, map, Observable } from 'rxjs';
 import { getObjectProperty } from '../internals/rx-state';
 import { ActionType, SelecPropType, SelectorReturnType } from '../types';
+import { isObject } from '@azlabsjs/utilities';
 
 // @internal
 export function Select<T, V = unknown>(
@@ -12,10 +13,10 @@ export function Select<T, V = unknown>(
         if (typeof prop === 'function') {
           return prop(state);
         }
-        if (typeof prop === 'string' && typeof state === 'object') {
-          return getObjectProperty(state as any, prop) as V;
+        if (typeof prop === 'string' && isObject(state)) {
+          return getObjectProperty(state, prop) as V;
         }
-        return state as any as V;
+        return state as unknown as V;
       })
     );
   };

@@ -5,3 +5,8 @@
 - Provide a global window.__DEV__ obejct [x]
 - Continue enhancements of the store object [x]
 - Review implementation of internal untilDestroy operator []
+
+## v0.3.x tasks
+
+- Remove rxjs compat function from the library []
+- Move until distroy to a dedicated library []

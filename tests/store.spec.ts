@@ -10,9 +10,9 @@ import {
   StoreType,
 } from '../src';
 import { delay, map, first, tap } from 'rxjs/operators';
-import { FluxStore } from '../src/state';
 import { interval, lastValueFrom } from 'rxjs';
 import { Select } from '../src/operators';
+import { FluxStore } from '../src/state';
 
 class Message {
   id!: string;
@@ -26,6 +26,7 @@ class MessageState {
   messages!: Message[];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function reducer(state: MessageState, action: Action<any>) {
   switch (action.type) {
     case '[MESSAGES_LOADING]':
@@ -45,7 +46,7 @@ export default function reducer(state: MessageState, action: Action<any>) {
         isLoading: false,
         messages: [...state.messages, action.payload],
       } as MessageState;
-    case '[MESSAGES_UPDATE]':
+    case '[MESSAGES_UPDATE]': {
       const messages = [...state.messages];
       const index = messages.findIndex(
         (value) => value.id === action.payload.id
@@ -58,6 +59,7 @@ export default function reducer(state: MessageState, action: Action<any>) {
         isLoading: false,
         messages,
       };
+    }
     case '[EMPTY_STORE_MESSAGES]':
       return {
         ...state,
@@ -80,10 +82,9 @@ function StoreProvider() {
   );
   return [store, useDispatch(store)] as [
     StoreType<MessageState, ActionType>,
-    (action: ActionType) => void
+    (action: ActionType) => void,
   ];
 }
-
 @Store({
   name: 'dummy',
 })
@@ -117,7 +118,7 @@ describe('Rx state test definitions', () => {
               ({
                 type: '[NEW_MESSAGE]',
                 payload: source,
-              } as Partial<Action<Message>>)
+              }) as Partial<Action<Message>>
           )
         ),
       };

@@ -4,8 +4,12 @@ import {
   StateReducerFn,
   Store,
 } from '../types';
-import { dispatchAction, setStoreName } from '../internals/rx-state';
+import { dispatchAction, registerStoreInGlobalRegistry } from '../internals/rx-state';
 import { FluxStore } from './rx-state';
+
+/** @internal */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type UnknownType = any;
 
 /**
  * @deprecated
@@ -16,7 +20,7 @@ import { FluxStore } from './rx-state';
  * @param handler
  */
 export const createActionDispatcher =
-  <T, A, S extends Store<T, A>, P extends unknown[] = any[]>(
+  <T, A, S extends Store<T, A>, P extends unknown[] = UnknownType[]>(
     store: S,
     handler: HandlerFn
   ) =>
@@ -43,7 +47,7 @@ export function createStore<T, A extends ActionType>(
   name?: string
 ) {
   const store = name
-    ? setStoreName(new FluxStore(reducer, (initial || {}) as T), name)
+    ? registerStoreInGlobalRegistry(new FluxStore(reducer, (initial || {}) as T), name)
     : new FluxStore(reducer, (initial || {}) as T);
   return store as Store<T, A>;
 }

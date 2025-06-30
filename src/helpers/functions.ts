@@ -8,7 +8,7 @@ import {
   ObservableInput,
   ReplaySubject,
   interval,
-  isObservable as isObservable_,
+  isObservable as isObservable$,
   EmptyError,
 } from 'rxjs';
 import { first, tap } from 'rxjs/operators';
@@ -38,26 +38,23 @@ export const createObservable = <T>(handler: ObserverHandlerFunc<T>) => {
 
 /**
  * Creates an observable from a non observable like input
- *
- * @param stream
  */
 export const observableOf = <T>(stream: T) => of(stream);
 
 /**
  * Creates an observable from an observable like input {@see ObservableInput}
  *
- * @param stream
  */
 export const observableFrom = <T>(stream: ObservableInput<T>) => from(stream);
 
 /**
  * Check if a given value is an observable
- * @param value Any type of data that can be checks for observable instance
  */
-export const isObservable = (value: any) => isObservable_(value);
+export const isObservable = (value: unknown) => isObservable$(value);
 
 /**
  * Creates an empty observable
+ *
  * @deprecated Use {@see empty()} instead
  */
 export const emptyObservable = () => empty();
@@ -69,9 +66,6 @@ export const empty = () => observableFrom(EMPTY);
 
 /**
  * Exceute the user provided callback after a certain milliseconds
- *
- * @param callback
- * @param ms
  */
 export const timeout = (callback: () => void, ms = 1000) =>
   interval(ms)
@@ -80,12 +74,9 @@ export const timeout = (callback: () => void, ms = 1000) =>
 
 /**
  * Exceute the user provided callback after a certain milliseconds
- *
- * @param callback
- * @param milliseconds
  */
-export const rxtimeout = (callback: () => void, milliseconds = 1000) =>
-  interval(milliseconds).pipe(
+export const rxtimeout = (callback: () => void, ms = 1000) =>
+  interval(ms).pipe(
     first(),
     tap(() => callback())
   );
