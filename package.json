@@ -49,11 +49,11 @@
   "size-limit": [
     {
       "path": "dist/cjs/index.cjs",
-      "limit": "20 KB"
+      "limit": "10 KB"
     },
     {
       "path": "dist/esm/index.mjs",
-      "limit": "20 KB"
+      "limit": "10 KB"
     }
   ],
   "publishConfig": {
