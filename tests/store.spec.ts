@@ -1,17 +1,17 @@
 import {
   createActionDispatcher,
   createStore,
-  observableOf,
   Action,
   useDispatch,
   Store,
   createReducer,
   ActionType,
   StoreType,
+  ofType,
+  Select,
 } from '../src';
 import { delay, map, first, tap } from 'rxjs/operators';
-import { interval, lastValueFrom } from 'rxjs';
-import { Select } from '../src/operators';
+import { interval, lastValueFrom, of } from 'rxjs';
 import { FluxStore } from '../src/state';
 
 class Message {
@@ -111,7 +111,7 @@ describe('Rx state test definitions', () => {
     const asyncAction = createActionDispatcher(store, (payload: Message) => {
       return {
         type: '[MESSAGES_LOADING]',
-        payload: observableOf<Message>(payload).pipe(
+        payload: of<Message>(payload).pipe(
           delay(1000),
           map(
             (source) =>
@@ -241,6 +241,36 @@ describe('Rx state test definitions', () => {
             )
             .subscribe();
         })
+      )
+    );
+  });
+
+  it('should return false for the last disptached action is [DECREMENTS] by ofType filter [INCREMENTS] actions', async () => {
+    let lastAction: string;
+    const store = new DummyStore(
+      createReducer({
+        '[INCREMENTS]': (state) => {
+          return ++state;
+        },
+        '[DECREMENTS]': (state) => --state,
+      }),
+      0
+    );
+    useDispatch(store)({ type: '[INCREMENTS]' });
+    useDispatch(store)({ type: '[INCREMENTS]' });
+    useDispatch(store)({ type: '[DECREMENTS]' });
+
+    store.actions$
+      .pipe(
+        ofType('[INCREMENTS]'),
+        tap((state) => (lastAction = state.type))
+      )
+      .subscribe();
+
+    await lastValueFrom(
+      interval(2000).pipe(
+        first(),
+        tap(() => expect(lastAction).not.toEqual('[DECREMENTS]'))
       )
     );
   });

@@ -1,4 +1,4 @@
-import { dispatchAction } from '../internals/rx-state';
+import { dispatchAction } from './internals';
 import { Store } from '../types';
 
 /**

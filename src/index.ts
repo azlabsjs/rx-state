@@ -1,25 +1,12 @@
 export {
-  createSubject,
-  createStateful,
-  createObservable,
-  observableOf,
-  observableFrom,
-  isObservable,
-  emptyObservable,
-  timeout,
-  rxtimeout,
-  empty,
-  lastValueFrom,
-  firstValueFrom,
-} from './helpers';
-
-export {
   createActionDispatcher,
   createStore,
   Store,
   Destroy,
   createReducer,
   useDispatch,
+  Select,
+  ofType,
 } from './state';
 
 // Type definitions
@@ -30,6 +17,3 @@ export {
   ReducersConfig,
   Store as StoreType,
 } from './types';
-
-// Operators
-export { doLog, ofType } from './operators';

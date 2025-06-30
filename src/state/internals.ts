@@ -5,6 +5,56 @@ import { ActionType, Store } from '../types';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type UnknownType = any;
 
+// This will be provided through Terser global definitions by Angular CLI. This will
+// help to tree-shake away the code unneeded for production bundles.
+declare const ngDevMode: boolean;
+
+let devMode: boolean;
+
+if (typeof ngDevMode === 'undefined' || ngDevMode === null) {
+  devMode = process.env.NODE_ENV !== 'production';
+} else {
+  devMode = ngDevMode;
+}
+
+// @internal
+export const ___RX_STATE__DEV__ = devMode;
+
+/** @internal */
+export function getObjectProperty<T extends { [prop: string]: UnknownType }>(
+  source: T,
+  key: string,
+  seperator = '.'
+) {
+  if (
+    key === '' ||
+    typeof key === 'undefined' ||
+    key === null ||
+    typeof source === 'undefined' ||
+    source === null
+  ) {
+    return source ?? undefined;
+  }
+  if (key.includes(seperator ?? '.')) {
+    // Creates an array of inner properties
+    const properties = key.split(seperator ?? '.');
+    const current = source;
+    // Reduce the source object to a single value
+    return properties.reduce((carry, prop) => {
+      if (carry) {
+        const type = typeof current;
+        carry =
+          (type === 'object' || type === 'function') && carry[prop]
+            ? (carry[prop] ?? undefined)
+            : undefined;
+      }
+      return carry;
+    }, source);
+  } else {
+    return source ? source[key] : undefined;
+  }
+}
+
 // @internal Provides an instance of javascript global context
 const runtime: Record<string, UnknownType> = !(
   typeof global === 'undefined' || global === null
@@ -72,40 +122,6 @@ export function registerStoreInGlobalRegistry<T>(instance: T, name: string) {
     setStores(stores.set(symbol, instance));
   }
   return instance;
-}
-
-export function getObjectProperty<T extends { [prop: string]: UnknownType }>(
-  source: T,
-  key: string,
-  seperator = '.'
-) {
-  if (
-    key === '' ||
-    typeof key === 'undefined' ||
-    key === null ||
-    typeof source === 'undefined' ||
-    source === null
-  ) {
-    return source ?? undefined;
-  }
-  if (key.includes(seperator ?? '.')) {
-    // Creates an array of inner properties
-    const properties = key.split(seperator ?? '.');
-    const current = source;
-    // Reduce the source object to a single value
-    return properties.reduce((carry, prop) => {
-      if (carry) {
-        const type = typeof current;
-        carry =
-          (type === 'object' || type === 'function') && carry[prop]
-            ? (carry[prop] ?? undefined)
-            : undefined;
-      }
-      return carry;
-    }, source);
-  } else {
-    return source ? source[key] : undefined;
-  }
 }
 
 // @internal

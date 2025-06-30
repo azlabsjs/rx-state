@@ -1,4 +1,4 @@
-import { registerStoreInGlobalRegistry } from '../internals/rx-state';
+import { registerStoreInGlobalRegistry } from './internals';
 import { Store as _Store } from '../types';
 
 /** @internal */

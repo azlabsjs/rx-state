@@ -1,7 +1,9 @@
 import { useRxEffect } from '@azlabsjs/rx-hooks';
 import {
+  from,
   isObservable,
   Observable,
+  ObservableInput,
   of,
   OperatorFunction,
   ReplaySubject,
@@ -14,9 +16,8 @@ import {
   scan,
   tap,
 } from 'rxjs/operators';
-import { ___RX_STATE__DEV__ } from '../internals/dev';
-import { addStateChanges } from '../internals/rx-state';
-import { Select } from '../operators/rx-state';
+import { addStateChanges, ___RX_STATE__DEV__ } from './internals';
+import { Select } from './operators';
 import {
   ActionType,
   SelecPropType,
@@ -60,7 +61,7 @@ export class FluxStore<T, A extends ActionType>
       this._dispatch$.pipe(
         concatMap((action) =>
           isObservable(action)
-            ? (action as Observable<A>)
+            ? from(action as ObservableInput<A>)
             : (of<A>(action) as Observable<A>)
         ),
         distinctUntilChanged(),
@@ -133,11 +134,7 @@ export class FluxStore<T, A extends ActionType>
   }
 
   // @internal
-  private reduce(
-    reducer: StateReducerFn<T, A>,
-    previous: T,
-    current: A
-  ) {
+  private reduce(reducer: StateReducerFn<T, A>, previous: T, current: A) {
     if (typeof current?.type === 'undefined' || current?.type === null) {
       return reducer(previous, current);
     }

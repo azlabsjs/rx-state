@@ -1,7 +1,9 @@
-import { getStores } from '../internals/rx-state';
+import { getStores } from './internals';
 
+// @internal
 type OnDestroy = { destroy: () => void };
 
+/** @internal */
 function implementsOnDestroy(value: unknown): value is OnDestroy {
   return (
     typeof value === 'object' &&

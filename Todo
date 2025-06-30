@@ -8,5 +8,5 @@
 
 ## v0.3.x tasks
 
-- Remove rxjs compat function from the library []
-- Move until distroy to a dedicated library []
+- Remove rxjs compat function from the library [x]
+- Move until distroy to a dedicated library [x]

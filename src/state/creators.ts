@@ -4,8 +4,8 @@ import {
   StateReducerFn,
   Store,
 } from '../types';
-import { dispatchAction, registerStoreInGlobalRegistry } from '../internals/rx-state';
-import { FluxStore } from './rx-state';
+import { dispatchAction, registerStoreInGlobalRegistry } from './internals';
+import { FluxStore } from './store';
 
 /** @internal */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -14,21 +14,19 @@ type UnknownType = any;
 /**
  * @deprecated
  * Create a store action function that will be dispatch
- * to the store when called on a given argumen
+ * to the store when called on a given arguments
  *
- * @param store
- * @param handler
  */
 export const createActionDispatcher =
   <T, A, S extends Store<T, A>, P extends unknown[] = UnknownType[]>(
     store: S,
-    handler: HandlerFn
+    handler: HandlerFn<P>
   ) =>
   (...args: P) =>
     dispatchAction(store, handler(...args) as ActionType);
 
 /**
- * Creator function for creating a store object\
+ * Creator function for creating a store object
  *
  * @example
  * // Create a store with a name that is registered in the global context

@@ -1,5 +1,5 @@
 import { filter, map, Observable } from 'rxjs';
-import { getObjectProperty } from '../internals/rx-state';
+import { getObjectProperty } from './internals';
 import { ActionType, SelecPropType, SelectorReturnType } from '../types';
 import { isObject } from '@azlabsjs/utilities';
 
